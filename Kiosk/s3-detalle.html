@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S3 Detalle de Bebida</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
+.drink-hero{height:220px;background:linear-gradient(135deg,#5c3820,#2c1a0e);display:flex;align-items:center;justify-content:center;font-size:96px;position:relative;}
+.hero-back{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;width:38px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.hero-back:hover{background:rgba(255,255,255,.25);}
+.hero-fav{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;width:38px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.drink-info{padding:20px 24px;}
+.drink-info h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--espresso);}
+.tagline{font-size:14px;color:var(--latte);margin:4px 0 12px;}
+.price-row-d{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.price-big{font-size:28px;font-weight:600;color:var(--caramel);font-family:'Playfair Display',serif;}
+.rating-chip{background:var(--mist);border:1px solid var(--warm);border-radius:20px;padding:5px 12px;font-size:13px;color:var(--espresso);display:flex;align-items:center;gap:4px;}
+.tags-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.tag{background:var(--mist);border:1px solid var(--warm);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--latte);}
+.desc-text{font-size:14px;line-height:1.6;color:var(--roast);margin-bottom:16px;}
+.nut-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.nut{background:var(--mist);border:1px solid var(--warm);border-radius:12px;padding:10px 6px;text-align:center;}
+.nut .nv{font-size:14px;font-weight:600;color:var(--caramel);}
+.nut .nl{font-size:10px;color:var(--latte);}
+.ing-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.ing-chip{background:var(--espresso);color:var(--cream);border-radius:10px;padding:5px 12px;font-size:12px;}
+.cta-row{display:flex;gap:10px;padding:0 24px 24px;}
+.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
+.btn-primary:hover{background:var(--roast);}
+.btn-outline{flex:0 0 auto;background:none;border:1.5px solid var(--espresso);color:var(--espresso);border-radius:14px;padding:14px 16px;font-size:18px;cursor:pointer;transition:background .15s;}
+.btn-outline:hover{background:var(--warm);}
+.btn-outline.fav{color:var(--danger);border-color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="drink-hero" id="drinkHero">
+    <button class="hero-back" onclick="window.location.href='s2-categorias.html'">←</button>
+    <span id="drinkEmoji">☕</span>
+    <button class="hero-fav" id="btnFav" onclick="toggleFav()">♡</button>
+  </div>
+
+  <div class="drink-info">
+    <h2 id="drinkNombre">Café Latte Clásico</h2>
+    <div class="tagline" id="drinkTagline">Espresso suave con leche vaporizada cremosa</div>
+
+    <div class="price-row-d">
+      <div class="price-big" id="drinkPrecio">$65.00</div>
+      <div class="rating-chip">⭐ <span id="drinkRating">4.8</span> <span style="color:var(--latte);font-size:11px" id="drinkReviews">(234)</span></div>
+    </div>
+
+    <div class="tags-row" id="drinkTags">
+      <span class="tag">☕ Cafeinado</span>
+      <span class="tag">🥛 Con lácteos</span>
+      <span class="tag">🔥 Caliente</span>
+    </div>
+
+    <div class="desc-text" id="drinkDesc">Doble shot de espresso de origen Veracruz, con leche entera vaporizada a 65°C. Notas de chocolate y nuez tostada en cada sorbo.</div>
+
+    <div class="nut-row">
+      <div class="nut"><div class="nv" id="kcal">120</div><div class="nl">Kcal</div></div>
+      <div class="nut"><div class="nv" id="grasa">6g</div><div class="nl">Grasa</div></div>
+      <div class="nut"><div class="nv" id="carbos">10g</div><div class="nl">Carbos</div></div>
+      <div class="nut"><div class="nv" id="cafeina">80mg</div><div class="nl">Cafeína</div></div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:8px;">Ingredientes base</p>
+    <div class="ing-chips" id="drinkIngs">
+      <div class="ing-chip">☕ Espresso ×2</div>
+      <div class="ing-chip">🥛 Leche entera</div>
+      <div class="ing-chip">💨 Espuma</div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button class="btn-outline" id="btnFavCTA" onclick="toggleFav()">♡</button>
+    <button class="btn-primary" onclick="window.location.href='s4-personalizar.html'">Personalizar bebida →</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/menu/bebida/:id → { nombre, emoji, tagline, precio, rating, reviews, tags, descripcion, nutricion, ingredientes }
+// GET /api/menu/bebida/:id/favorito → { esFavorito }
+// POST /api/menu/bebida/:id/favorito → toggle favorito (requiere sesión cliente)
+
+const params = new URLSearchParams(window.location.search);
+const productoId = params.get('producto') || 'cafe-latte';
+// TODO: fetch(`/api/menu/bebida/${productoId}`).then(r=>r.json()).then(renderDetalle)
+
+let esFavorito = false;
+function toggleFav() {
+  esFavorito = !esFavorito;
+  const icono = esFavorito ? '♥' : '♡';
+  document.getElementById('btnFav').textContent = icono;
+  document.getElementById('btnFavCTA').textContent = icono;
+  document.getElementById('btnFavCTA').classList.toggle('fav', esFavorito);
+  // TODO: POST /api/menu/bebida/${productoId}/favorito
+  console.log('Toggle favorito:', productoId, esFavorito);
+}
+</script>
+</body>
+</html>

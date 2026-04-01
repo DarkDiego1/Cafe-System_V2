@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S8 Estado del Pedido</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--espresso);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+.wait-order-id{font-size:13px;color:var(--warm);margin-top:32px;margin-bottom:4px;}
+.wait-timer{margin-top:12px;position:relative;width:160px;height:160px;margin-bottom:20px;}
+.wait-timer svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
+.wait-timer circle{fill:none;stroke:rgba(255,255,255,.1);stroke-width:8;}
+.wait-timer .progress{stroke:var(--gold);stroke-dasharray:440;stroke-dashoffset:110;stroke-linecap:round;transition:stroke-dashoffset 1s linear;}
+.wait-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.wt-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--cream);line-height:1;}
+.wt-label{font-size:11px;color:var(--warm);margin-top:3px;}
+.wait-status{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--cream);margin-bottom:28px;}
+.status-steps{display:flex;align-items:center;margin:0 24px 10px;width:calc(100% - 48px);}
+.step-dot{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,.4);flex-shrink:0;}
+.step-dot.done{background:var(--success);border-color:var(--success);color:#fff;}
+.step-dot.active{background:var(--gold);border-color:var(--gold);color:var(--espresso);animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(232,168,48,.25)}50%{box-shadow:0 0 0 8px rgba(232,168,48,.1)}}
+.step-line{flex:1;height:2px;background:rgba(255,255,255,.1);}
+.step-line.done{background:var(--success);}
+.step-labels{display:flex;justify-content:space-between;margin:8px 20px 24px;width:calc(100% - 40px);}
+.step-labels span{font-size:10px;color:rgba(255,255,255,.4);text-align:center;width:60px;}
+.step-labels span.active{color:var(--gold);}
+.step-labels span.done{color:rgba(255,255,255,.6);}
+.fact-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px 24px;margin:0 24px;width:calc(100% - 48px);text-align:center;}
+.fact-card h3{font-family:'Playfair Display',serif;font-size:17px;color:var(--cream);margin-bottom:8px;}
+.fact-card p{font-size:13px;color:var(--warm);line-height:1.6;}
+.wait-bottom{padding:20px 24px;width:100%;margin-top:auto;}
+.btn-secondary{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--cream);border-radius:14px;padding:14px;font-size:14px;cursor:pointer;font-family:inherit;}
+.btn-secondary:hover{background:rgba(255,255,255,.15);}
+.lista-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.lista-card{background:var(--success);border-radius:28px;padding:40px 32px;text-align:center;margin:24px;}
+.lista-icon{font-size:64px;margin-bottom:16px;}
+.lista-titulo{font-family:'Playfair Display',serif;font-size:28px;color:#fff;margin-bottom:8px;}
+.lista-sub{color:rgba(255,255,255,.8);font-size:14px;}
+.btn-recoger{background:#fff;color:var(--success);border:none;border-radius:14px;padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;margin-top:24px;font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="wait-order-id" id="ordenHeader">Orden #247 · CNH-247</div>
+
+  <div class="wait-timer">
+    <svg width="160" height="160">
+      <circle cx="80" cy="80" r="70"/>
+      <circle class="progress" id="progressCircle" cx="80" cy="80" r="70"/>
+    </svg>
+    <div class="wait-center">
+      <div class="wt-num" id="countdown">8</div>
+      <div class="wt-label">minutos</div>
+    </div>
+  </div>
+
+  <div class="wait-status" id="statusText">Preparando tu pedido...</div>
+
+  <div class="status-steps" id="stepsContainer">
+    <div class="step-dot done" id="step1">✓</div>
+    <div class="step-line done" id="line1"></div>
+    <div class="step-dot done" id="step2">✓</div>
+    <div class="step-line done" id="line2"></div>
+    <div class="step-dot active" id="step3">⚙</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-dot" id="step4">🔔</div>
+  </div>
+  <div class="step-labels">
+    <span class="done">Recibida</span>
+    <span class="done">Confirmada</span>
+    <span class="active" id="labelPrep">Preparando</span>
+    <span id="labelLista">Lista</span>
+  </div>
+
+  <div class="fact-card">
+    <h3 id="factTitle">☕ Dato de origen</h3>
+    <p id="factText">Nuestros granos vienen de la Sierra de Zacatecas, cultivados a 2,100 metros sobre el nivel del mar — eso les da su acidez brillante y carácter único.</p>
+  </div>
+
+  <div class="wait-bottom">
+    <button class="btn-secondary" onclick="window.location.href='s1-bienvenida.html'">← Hacer otro pedido</button>
+  </div>
+</div>
+
+<!-- Overlay: orden lista -->
+<div class="lista-overlay" id="listaOverlay" style="display:none">
+  <div class="lista-card">
+    <div class="lista-icon">🔔</div>
+    <div class="lista-titulo">¡Tu orden está lista!</div>
+    <div class="lista-sub">Recoge tu pedido en el mostrador<br>con el código <strong id="codigoRecogida">CNH-247</strong></div>
+    <button class="btn-recoger" onclick="document.getElementById('listaOverlay').style.display='none'">Entendido ✓</button>
+  </div>
+</div>
+
+<script>
+// Integración backend:
+// GET /api/ordenes/:id/estado → { estado: 'recibida'|'confirmada'|'preparando'|'lista', tiempoRestante }
+// WS /ws/ordenes/:id → actualizaciones de estado en tiempo real
+
+const params = new URLSearchParams(window.location.search);
+const ordenId = params.get('orden') || '247';
+const codigo = `CNH-${ordenId}`;
+
+document.getElementById('ordenHeader').textContent = `Orden #${ordenId} · ${codigo}`;
+document.getElementById('codigoRecogida').textContent = codigo;
+
+// Datos curiosos rotativos
+const facts = [
+  { title:'☕ Dato de origen', text:'Nuestros granos vienen de la Sierra de Zacatecas, cultivados a 2,100 metros — eso les da su acidez brillante.' },
+  { title:'🌱 Cultivo sostenible', text:'Trabajamos con 12 familias cafeticultoras locales. Cada taza que ordenas apoya su sustento directamente.' },
+  { title:'🔬 El proceso', text:'Del cereza al taza: 18 meses de cultivo, 36 horas de fermentación y tueste artesanal en nuestra planta.' },
+  { title:'🏆 Reconocimiento', text:'Ganadores del Premio Nacional del Café 2024 en la categoría de mejor espresso de especialidad.' }
+];
+let factIdx = 0;
+setInterval(() => {
+  factIdx = (factIdx + 1) % facts.length;
+  document.getElementById('factTitle').textContent = facts[factIdx].title;
+  document.getElementById('factText').textContent = facts[factIdx].text;
+}, 10000);
+
+// Countdown timer
+const TOTAL_MINUTOS = 8;
+const circumference = 2 * Math.PI * 70; // ≈ 440
+const progressEl = document.getElementById('progressCircle');
+progressEl.style.strokeDasharray = circumference;
+
+let minRestantes = TOTAL_MINUTOS;
+
+function actualizarTimer(min) {
+  document.getElementById('countdown').textContent = min;
+  const offset = circumference * (1 - (TOTAL_MINUTOS - min) / TOTAL_MINUTOS);
+  progressEl.style.strokeDashoffset = offset;
+}
+
+actualizarTimer(minRestantes);
+
+const timerInterval = setInterval(() => {
+  if (minRestantes <= 0) {
+    clearInterval(timerInterval);
+    mostrarListaOverlay();
+    return;
+  }
+  minRestantes--;
+  actualizarTimer(minRestantes);
+}, 60000); // cada minuto real
+
+// Simulación demo (cada 2 segundos para demo)
+// let demo = TOTAL_MINUTOS;
+// setInterval(() => { if(demo>0) actualizarTimer(--demo); else mostrarListaOverlay(); }, 2000);
+
+// TODO: WebSocket real
+// const ws = new WebSocket(`wss://api.dominia.mx/ws/ordenes/${ordenId}`);
+// ws.onmessage = (e) => {
+//   const data = JSON.parse(e.data);
+//   if (data.estado === 'lista') mostrarListaOverlay();
+//   if (data.tiempoRestante) actualizarTimer(data.tiempoRestante);
+// };
+
+function mostrarListaOverlay() {
+  // Actualizar steps a completo
+  document.getElementById('step3').className = 'step-dot done';
+  document.getElementById('step3').textContent = '✓';
+  document.getElementById('line3').className = 'step-line done';
+  document.getElementById('step4').className = 'step-dot active';
+  document.getElementById('step4').textContent = '🔔';
+  document.getElementById('labelPrep').className = 'done';
+  document.getElementById('labelLista').className = 'active';
+  document.getElementById('statusText').textContent = '¡Tu pedido está listo!';
+  document.getElementById('listaOverlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

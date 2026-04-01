@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S1 Bienvenida</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--espresso);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--espresso);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.weather-chip{position:absolute;top:24px;right:24px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:6px 12px;color:var(--warm);font-size:12px;display:flex;align-items:center;gap:5px;}
+.welcome-art{width:200px;height:200px;background:radial-gradient(circle at 40% 35%,#5c3820,#2c1a0e 70%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:84px;margin-bottom:28px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.welcome-brand{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--cream);line-height:1.15;margin-bottom:8px;}
+.welcome-brand span{color:var(--gold);}
+.welcome-sub{color:var(--warm);font-size:13px;letter-spacing:.5px;margin-bottom:40px;}
+.welcome-cta{background:var(--gold);color:var(--espresso);border:none;border-radius:50px;padding:17px 52px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(232,168,48,.35);font-family:inherit;transition:transform .15s,box-shadow .15s;}
+.welcome-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,168,48,.45);}
+.welcome-lang{margin-top:20px;display:flex;gap:12px;}
+.lang-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--warm);border-radius:20px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:background .15s;}
+.lang-btn.active,.lang-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
+.info-chips{display:flex;gap:10px;margin-top:24px;padding:0 24px;}
+.ic-block{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 16px;text-align:center;flex:1;}
+.ic-block .ii{font-size:18px;margin-bottom:4px;}
+.ic-block p{font-size:10px;color:rgba(255,255,255,.45);}
+.ic-block strong{color:var(--warm);font-size:11px;}
+/* Inactividad timer */
+.inactivity-bar{position:absolute;bottom:0;left:0;height:3px;background:var(--gold);width:100%;transform-origin:left;transition:transform linear;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="weather-chip" id="weatherChip">☀️ 24°C · Zacatecas</div>
+
+  <div class="welcome-art">☕</div>
+  <div class="welcome-brand">Café Nuevos<br><span>Horizontes</span></div>
+  <div class="welcome-sub">Café de origen mexicano ✦ Personaliza tu bebida</div>
+
+  <button class="welcome-cta" onclick="window.location.href='s2-categorias.html'">Comenzar pedido</button>
+
+  <div class="welcome-lang">
+    <button class="lang-btn active" id="btnES" onclick="setLang('es')">🇲🇽 Español</button>
+    <button class="lang-btn" id="btnEN" onclick="setLang('en')">🇺🇸 English</button>
+  </div>
+
+  <div class="info-chips">
+    <div class="ic-block"><div class="ii">⏱️</div><p>Tiempo prom.</p><strong>8–12 min</strong></div>
+    <div class="ic-block"><div class="ii">🛡️</div><p>Pago seguro</p><strong>encriptado</strong></div>
+    <div class="ic-block"><div class="ii">🌱</div><p>Origen</p><strong>Zacatecas</strong></div>
+  </div>
+
+  <div class="inactivity-bar" id="inactivityBar"></div>
+</div>
+<script>
+// Integración backend:
+// GET /api/kiosco/clima → { temperatura, condicion, ciudad }
+// GET /api/kiosco/tiempoEspera → { promedio }
+// Esta pantalla actúa como "screensaver" del kiosco — se muestra cuando hay inactividad
+
+// Idle timer: si el kiosco lleva inactivo 60s, vuelve a esta pantalla
+let idleTimeout;
+const IDLE_LIMIT = 60000;
+
+function resetIdle() {
+  clearTimeout(idleTimeout);
+  idleTimeout = setTimeout(() => {
+    // Resetear a pantalla de bienvenida si hay otras pantallas cargadas
+    console.log('Kiosco inactivo — volviendo a bienvenida');
+  }, IDLE_LIMIT);
+}
+
+document.addEventListener('touchstart', resetIdle);
+document.addEventListener('mousemove', resetIdle);
+resetIdle();
+
+// Selección de idioma
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(lang === 'es' ? 'btnES' : 'btnEN').classList.add('active');
+  // TODO: i18n — cambiar textos al idioma seleccionado
+  // sessionStorage.setItem('lang', lang);
+  console.log('Idioma seleccionado:', lang);
+}
+
+// Clima dinámico (placeholder)
+// fetch('/api/kiosco/clima').then(r=>r.json()).then(d => {
+//   document.getElementById('weatherChip').textContent = `☀️ ${d.temperatura}°C · ${d.ciudad}`;
+// });
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S2 Categorías</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;transition:background .15s;}
+.back-btn:hover{background:var(--warm);}
+.cart-pill{background:var(--espresso);color:var(--cream);border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s;}
+.cart-pill .badge{background:var(--gold);color:var(--espresso);border-radius:10px;padding:1px 7px;font-size:12px;font-weight:600;}
+.section-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);padding:0 24px;margin-bottom:10px;}
+.greeting-bar{padding:16px 24px 0;}
+.greeting-bar h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--espresso);}
+.greeting-bar p{font-size:13px;color:var(--latte);margin-top:2px;}
+.search-bar{margin:14px 24px;display:flex;align-items:center;background:var(--mist);border:1.5px solid var(--warm);border-radius:14px;padding:10px 14px;gap:8px;}
+.search-bar input{background:none;border:none;outline:none;font-size:14px;color:var(--espresso);flex:1;font-family:'DM Sans',sans-serif;}
+.search-bar input::placeholder{color:var(--latte);opacity:.7;}
+.popular-row{padding:0 24px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin-bottom:20px;}
+.pop-chip{background:var(--espresso);color:var(--cream);border-radius:20px;padding:8px 14px;font-size:12px;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;transition:background .15s;}
+.pop-chip:hover{background:var(--roast);}
+.pop-chip.gold{background:var(--gold);color:var(--espresso);}
+.cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 80px;}
+.cat-card{border-radius:18px;overflow:hidden;cursor:pointer;position:relative;height:110px;transition:transform .15s;}
+.cat-card:hover{transform:scale(1.02);}
+.cat-card .bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;}
+.cat-card .overlay{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(44,26,14,.72));}
+.cat-card .cat-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:#fff;}
+.cat-card .cat-count{font-size:11px;color:rgba(255,255,255,.7);}
+.cat-card.cafe .bg{background:linear-gradient(135deg,#5c3820,#8b5e3c);}
+.cat-card.te .bg{background:linear-gradient(135deg,#2d5016,#4a8022);}
+.cat-card.frape .bg{background:linear-gradient(135deg,#1a3a5c,#2e6b9e);}
+.cat-card.jugo .bg{background:linear-gradient(135deg,#7a2d00,#c45a00);}
+.cat-card.caliente .bg{background:linear-gradient(135deg,#6b1a1a,#a33030);}
+.cat-card.especial .bg{background:linear-gradient(135deg,#4a1a6b,#7a30a3);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='s1-bienvenida.html'">←</button>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <button class="cart-pill" id="btnCarrito" onclick="window.location.href='s5-carrito.html'">
+      🛒 <span class="badge" id="cartCount">0</span>
+    </button>
+  </div>
+
+  <div class="greeting-bar">
+    <h2>¿Qué vas a ordenar hoy?</h2>
+    <p id="saludoContexto">☀️ Día soleado — perfectas para una bebida fría</p>
+  </div>
+
+  <div class="search-bar">
+    <span>🔍</span>
+    <input type="text" id="busqueda" placeholder="Busca tu bebida favorita...">
+  </div>
+
+  <div class="section-label">Populares ahora</div>
+  <div class="popular-row">
+    <div class="pop-chip gold">🔥 Más pedido</div>
+    <div class="pop-chip" onclick="irDetalle('cafe-latte')">☕ Café Latte</div>
+    <div class="pop-chip" onclick="irDetalle('frape-caramelo')">🧋 Frapé Caramelo</div>
+    <div class="pop-chip" onclick="irDetalle('matcha-latte')">🍵 Matcha Latte</div>
+    <div class="pop-chip" onclick="irDetalle('cold-brew')">❄️ Cold Brew</div>
+  </div>
+
+  <div class="section-label">Categorías</div>
+  <div class="cats-grid" id="catGrid">
+    <div class="cat-card cafe" onclick="irCategoria('cafes')"><div class="bg">☕</div><div class="overlay"><div class="cat-name">Cafés</div><div class="cat-count">12 bebidas</div></div></div>
+    <div class="cat-card te" onclick="irCategoria('tes')"><div class="bg">🍵</div><div class="overlay"><div class="cat-name">Tés &amp; Matcha</div><div class="cat-count">8 bebidas</div></div></div>
+    <div class="cat-card frape" onclick="irCategoria('frapes')"><div class="bg">🧋</div><div class="overlay"><div class="cat-name">Frapés</div><div class="cat-count">10 bebidas</div></div></div>
+    <div class="cat-card jugo" onclick="irCategoria('jugos')"><div class="bg">🍊</div><div class="overlay"><div class="cat-name">Jugos</div><div class="cat-count">6 bebidas</div></div></div>
+    <div class="cat-card caliente" onclick="irCategoria('calientes')"><div class="bg">🫖</div><div class="overlay"><div class="cat-name">Bebidas calientes</div><div class="cat-count">9 bebidas</div></div></div>
+    <div class="cat-card especial" onclick="irCategoria('especiales')"><div class="bg">✨</div><div class="overlay"><div class="cat-name">Especiales</div><div class="cat-count">5 bebidas</div></div></div>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/menu/categorias → [{ id, nombre, icono, count, gradiente }]
+// GET /api/menu/populares → [{ id, nombre, icono }]
+// Carrito persiste en sessionStorage
+
+// Cargar conteo del carrito
+function actualizarCarrito() {
+  const carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+  const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+  document.getElementById('cartCount').textContent = total;
+  document.getElementById('btnCarrito').style.display = total > 0 ? 'flex' : 'flex';
+}
+actualizarCarrito();
+
+function irDetalle(productoId) {
+  // TODO: window.location.href = `s3-detalle.html?producto=${productoId}`
+  window.location.href = 's3-detalle.html';
+}
+
+function irCategoria(categoriaId) {
+  // TODO: window.location.href = `s3-detalle.html?categoria=${categoriaId}`
+  window.location.href = 's3-detalle.html';
+}
+
+// Búsqueda
+document.getElementById('busqueda').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  if (q.length >= 2) {
+    // TODO: fetch(`/api/menu/buscar?q=${q}`).then(r=>r.json()).then(mostrarResultados)
+    console.log('Buscar:', q);
+  }
+});
+
+// Saludo contextual según hora
+const hora = new Date().getHours();
+const saludoEl = document.getElementById('saludoContexto');
+if (hora < 11) saludoEl.textContent = '☀️ Buenos días — perfectas para una bebida caliente';
+else if (hora < 15) saludoEl.textContent = '☀️ La hora perfecta para un frapé bien frío';
+else saludoEl.textContent = '🌙 Buenas tardes — ¿un latte relajante?';
+</script>
+</body>
+</html>

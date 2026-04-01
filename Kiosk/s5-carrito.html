@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S5 Carrito</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
+.cart-content{padding:16px 24px;flex:1;}
+.cart-content h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:16px;}
+.cart-item{background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
+.ci-icon{font-size:38px;flex-shrink:0;}
+.ci-body{flex:1;}
+.ci-name{font-weight:500;font-size:15px;}
+.ci-mods{font-size:12px;color:var(--latte);margin-top:3px;}
+.ci-actions{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.qty-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--warm);background:var(--cream);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--espresso);transition:background .15s;}
+.qty-btn:hover{background:var(--warm);}
+.qty-num{font-size:15px;font-weight:500;min-width:20px;text-align:center;}
+.ci-price{font-size:15px;font-weight:600;color:var(--caramel);white-space:nowrap;}
+.ci-del{background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;padding:4px;flex-shrink:0;}
+.sugg-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-top:10px;}
+.sugg-card{background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:12px;text-align:center;cursor:pointer;flex-shrink:0;width:90px;transition:transform .15s;}
+.sugg-card:hover{transform:translateY(-2px);}
+.sc-icon{font-size:28px;}
+.sc-name{font-size:11px;font-weight:500;margin-top:4px;}
+.sc-price{font-size:11px;color:var(--latte);}
+.cart-summary{background:var(--foam);border-top:1px solid var(--warm);padding:16px 24px;}
+.summary-row{display:flex;justify-content:space-between;font-size:14px;color:var(--latte);margin-bottom:6px;}
+.summary-row.total{font-size:18px;font-weight:600;color:var(--espresso);border-top:1px solid var(--warm);padding-top:10px;margin-top:6px;}
+.summary-row.total span:last-child{color:var(--caramel);}
+.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;margin-top:14px;transition:background .15s;font-family:inherit;}
+.btn-full.gold{background:var(--gold);color:var(--espresso);}
+.btn-full.gold:hover{opacity:.9;}
+.empty-cart{text-align:center;padding:60px 24px;color:var(--latte);}
+.empty-cart .ec-icon{font-size:64px;margin-bottom:16px;}
+.empty-cart h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--espresso);margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='s2-categorias.html'">←</button>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <span style="font-size:13px;color:var(--latte)">Tu orden</span>
+  </div>
+
+  <div class="cart-content">
+    <h2>Tu carrito</h2>
+    <div id="listaItems">
+      <!-- Se renderiza dinámicamente -->
+      <div class="cart-item">
+        <div class="ci-icon">☕</div>
+        <div class="ci-body">
+          <div class="ci-name">Café Latte Clásico</div>
+          <div class="ci-mods">Mediano · Caliente · +Caramelo · +Canela</div>
+          <div class="ci-actions">
+            <button class="qty-btn" onclick="cambiarCantidad(0,-1)">−</button>
+            <span class="qty-num" id="qty-0">1</span>
+            <button class="qty-btn" onclick="cambiarCantidad(0,1)">+</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <button class="ci-del" onclick="eliminarItem(0)">🗑</button>
+          <div class="ci-price" id="price-0">$88</div>
+        </div>
+      </div>
+      <div class="cart-item">
+        <div class="ci-icon">🧋</div>
+        <div class="ci-body">
+          <div class="ci-name">Frapé de Caramelo</div>
+          <div class="ci-mods">Grande · Frío · +Crema extra</div>
+          <div class="ci-actions">
+            <button class="qty-btn" onclick="cambiarCantidad(1,-1)">−</button>
+            <span class="qty-num" id="qty-1">1</span>
+            <button class="qty-btn" onclick="cambiarCantidad(1,1)">+</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <button class="ci-del" onclick="eliminarItem(1)">🗑</button>
+          <div class="ci-price" id="price-1">$100</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--warm);margin:16px 0"></div>
+    <p style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;">¿Algo más?</p>
+    <div class="sugg-row">
+      <div class="sugg-card"><div class="sc-icon">🥐</div><div class="sc-name">Croissant</div><div class="sc-price">$35</div></div>
+      <div class="sugg-card"><div class="sc-icon">🍰</div><div class="sc-name">Pay de queso</div><div class="sc-price">$45</div></div>
+      <div class="sugg-card"><div class="sc-icon">🍫</div><div class="sc-name">Brownie</div><div class="sc-price">$40</div></div>
+      <div class="sugg-card"><div class="sc-icon">🍵</div><div class="sc-name">Té matcha</div><div class="sc-price">$70</div></div>
+    </div>
+  </div>
+
+  <div class="cart-summary">
+    <div class="summary-row"><span>Subtotal</span><span id="subtotal">$188</span></div>
+    <div class="summary-row"><span>Descuento miembro</span><span id="descuento" style="color:var(--success)">−$0</span></div>
+    <div class="summary-row total"><span>Total</span><span id="total">$188</span></div>
+    <button class="btn-full gold" onclick="window.location.href='s6-pago.html'">Continuar al pago →</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/carrito/:sessionId → { items:[...], subtotal, descuento, total }
+// PATCH /api/carrito/:sessionId/item/:id → { cantidad }
+// DELETE /api/carrito/:sessionId/item/:id
+// POST /api/carrito/:sessionId/sugerido/:id → agregar item sugerido
+
+// Cargar carrito de sessionStorage (o del backend)
+// const carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+
+const precios = [88, 100]; // precio por índice de item (en demo estático)
+const cantidades = [1, 1];
+
+function cambiarCantidad(idx, delta) {
+  cantidades[idx] = Math.max(1, cantidades[idx] + delta);
+  document.getElementById(`qty-${idx}`).textContent = cantidades[idx];
+  document.getElementById(`price-${idx}`).textContent = `$${precios[idx] * cantidades[idx]}`;
+  recalcular();
+  // TODO: PATCH /api/carrito/item/${idx}
+}
+
+function eliminarItem(idx) {
+  // TODO: DELETE /api/carrito/item/${idx}
+  console.log('Eliminar item:', idx);
+  // En producción: re-renderizar la lista
+}
+
+function recalcular() {
+  const sub = cantidades.reduce((s, c, i) => s + precios[i] * c, 0);
+  document.getElementById('subtotal').textContent = `$${sub}`;
+  document.getElementById('total').textContent = `$${sub}`;
+}
+</script>
+</body>
+</html>

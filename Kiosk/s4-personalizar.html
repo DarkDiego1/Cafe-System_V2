@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S4 Personalizar</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
+.cart-pill{background:var(--espresso);color:var(--cream);border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.cart-pill .badge{background:var(--gold);color:var(--espresso);border-radius:10px;padding:1px 7px;font-size:12px;font-weight:600;}
+.custom-header{padding:20px 24px 16px;}
+.custom-header h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--espresso);}
+.price-live{font-size:24px;font-weight:600;color:var(--caramel);font-family:'Playfair Display',serif;margin-top:4px;}
+.drink-preview-wrap{background:var(--mist);border:1px solid var(--warm);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin:0 24px 16px;}
+.drink-preview-cup{font-size:52px;line-height:1;}
+.drink-preview-info h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;}
+.drink-preview-info p{font-size:12px;color:var(--latte);margin-top:3px;}
+.custom-section{padding:0 24px 18px;}
+.custom-section h3{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:12px;}
+.size-row{display:flex;gap:8px;}
+.size-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.size-btn .si{font-size:24px;display:block;}
+.size-btn .sl{font-size:12px;font-weight:500;color:var(--espresso);margin-top:4px;display:block;}
+.size-btn .sp{font-size:11px;color:var(--latte);}
+.size-btn.active{border-color:var(--caramel);background:#fdf4e3;box-shadow:0 0 0 3px rgba(196,127,43,.15);}
+.temp-row{display:flex;gap:8px;}
+.temp-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--espresso);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
+.temp-btn.active{border-color:var(--caramel);background:#fdf4e3;}
+.ing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ing-item{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;position:relative;}
+.ing-item .ing-icon{font-size:26px;display:block;margin-bottom:4px;}
+.ing-item .ing-name{font-size:11px;font-weight:500;color:var(--espresso);}
+.ing-item .ing-price{font-size:10px;color:var(--latte);}
+.ing-item.active{border-color:var(--caramel);background:#fdf4e3;}
+.ing-item.active::after{content:'✓';position:absolute;top:4px;right:6px;font-size:11px;color:var(--caramel);font-weight:700;}
+.notes-input{width:100%;background:var(--mist);border:1.5px solid var(--warm);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--espresso);font-family:'DM Sans',sans-serif;resize:none;outline:none;}
+.notes-input:focus{border-color:var(--caramel);}
+.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
+.btn-primary:hover{background:var(--roast);}
+.btn-outline{flex:0 0 auto;background:none;border:1.5px solid var(--espresso);color:var(--espresso);border-radius:14px;padding:14px 16px;font-size:18px;cursor:pointer;transition:background .15s;}
+.btn-outline:hover{background:var(--warm);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='s3-detalle.html'">←</button>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <button class="cart-pill" onclick="window.location.href='s5-carrito.html'">🛒 <span class="badge" id="cartCount">2</span></button>
+  </div>
+
+  <div class="custom-header">
+    <h2>Personaliza tu Latte</h2>
+    <div class="price-live" id="priceLive">$65.00</div>
+  </div>
+
+  <div class="drink-preview-wrap">
+    <div class="drink-preview-cup" id="previewCup">☕</div>
+    <div class="drink-preview-info">
+      <h4 id="previewName">Latte Chico · Caliente</h4>
+      <p id="previewMods">Espresso · Leche entera · Espuma</p>
+    </div>
+  </div>
+
+  <!-- Tamaño -->
+  <div class="custom-section">
+    <h3>Tamaño</h3>
+    <div class="size-row">
+      <div class="size-btn active" onclick="selSz(this,'Chico',0,'🥤')">
+        <span class="si">🥤</span><span class="sl">Chico</span><span class="sp">$65</span>
+      </div>
+      <div class="size-btn" onclick="selSz(this,'Mediano',15,'☕')">
+        <span class="si">☕</span><span class="sl">Mediano</span><span class="sp">$80</span>
+      </div>
+      <div class="size-btn" onclick="selSz(this,'Grande',25,'🫖')">
+        <span class="si">🫖</span><span class="sl">Grande</span><span class="sp">$90</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Temperatura -->
+  <div class="custom-section">
+    <h3>Temperatura</h3>
+    <div class="temp-row">
+      <div class="temp-btn active" onclick="selTemp(this,'Caliente')">🔥 Caliente</div>
+      <div class="temp-btn" onclick="selTemp(this,'Tibio')">🌡️ Tibio</div>
+      <div class="temp-btn" onclick="selTemp(this,'Frío')">🧊 Frío</div>
+    </div>
+  </div>
+
+  <!-- Ingredientes extras -->
+  <div class="custom-section">
+    <h3>Ingredientes extras</h3>
+    <div class="ing-grid">
+      <div class="ing-item active" onclick="togIng(this,'Espresso',0)"><span class="ing-icon">☕</span><div class="ing-name">Espresso</div><div class="ing-price">Incluido</div></div>
+      <div class="ing-item active" onclick="togIng(this,'Leche',0)"><span class="ing-icon">🥛</span><div class="ing-name">Leche entera</div><div class="ing-price">Incluido</div></div>
+      <div class="ing-item" onclick="togIng(this,'Leche vegetal',8)"><span class="ing-icon">🌱</span><div class="ing-name">Leche vegetal</div><div class="ing-price">+$8</div></div>
+      <div class="ing-item" onclick="togIng(this,'Caramelo',5)"><span class="ing-icon">🍮</span><div class="ing-name">Caramelo</div><div class="ing-price">+$5</div></div>
+      <div class="ing-item" onclick="togIng(this,'Crema extra',10)"><span class="ing-icon">🍦</span><div class="ing-name">Crema extra</div><div class="ing-price">+$10</div></div>
+      <div class="ing-item" onclick="togIng(this,'Canela',3)"><span class="ing-icon">🌿</span><div class="ing-name">Canela</div><div class="ing-price">+$3</div></div>
+      <div class="ing-item" onclick="togIng(this,'Vainilla',5)"><span class="ing-icon">🌸</span><div class="ing-name">Vainilla</div><div class="ing-price">+$5</div></div>
+      <div class="ing-item" onclick="togIng(this,'Chocolate',8)"><span class="ing-icon">🍫</span><div class="ing-name">Chocolate</div><div class="ing-price">+$8</div></div>
+      <div class="ing-item" onclick="togIng(this,'Avellana',6)"><span class="ing-icon">🌰</span><div class="ing-name">Avellana</div><div class="ing-price">+$6</div></div>
+    </div>
+  </div>
+
+  <!-- Notas -->
+  <div class="custom-section">
+    <h3>Notas especiales</h3>
+    <textarea class="notes-input" id="notasCliente" rows="2" placeholder="Ej: sin azúcar, extra hielo, leche de almendras…"></textarea>
+  </div>
+
+  <div style="padding:0 24px 24px;display:flex;gap:10px;">
+    <button class="btn-outline" onclick="window.location.href='s3-detalle.html'">←</button>
+    <button class="btn-primary" id="btnAgregar" onclick="agregarAlCarrito()">Agregar al carrito</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/menu/bebida/:id/personalizacion → { tamanos, temperaturas, extras }
+// POST /api/carrito/agregar → { productoId, tamano, temperatura, extras, notas, cantidad }
+
+let precioBase = 65;
+let extraTamano = 0;
+let extraIngredientes = 0;
+
+function actualizarPrecio() {
+  const total = precioBase + extraTamano + extraIngredientes;
+  document.getElementById('priceLive').textContent = `$${total}.00`;
+}
+
+function selSz(el, lbl, extra, ico) {
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  extraTamano = extra;
+  document.getElementById('previewCup').textContent = ico;
+  const nm = document.getElementById('previewName');
+  const temp = nm.textContent.split('·')[1]?.trim() || 'Caliente';
+  nm.textContent = `Latte ${lbl} · ${temp}`;
+  actualizarPrecio();
+}
+
+function selTemp(el, lbl) {
+  document.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const nm = document.getElementById('previewName');
+  const sz = nm.textContent.split('·')[0]?.trim() || 'Latte Chico';
+  nm.textContent = `${sz} · ${lbl}`;
+}
+
+function togIng(el, nombre, precio) {
+  el.classList.toggle('active');
+  extraIngredientes += el.classList.contains('active') ? precio : -precio;
+  const mods = [...document.querySelectorAll('.ing-item.active')]
+    .map(i => i.querySelector('.ing-name').textContent).join(' · ');
+  document.getElementById('previewMods').textContent = mods;
+  actualizarPrecio();
+}
+
+function agregarAlCarrito() {
+  const item = {
+    id: Date.now(),
+    productoId: new URLSearchParams(window.location.search).get('producto') || 'cafe-latte',
+    nombre: document.getElementById('previewName').textContent,
+    emoji: document.getElementById('previewCup').textContent,
+    precio: precioBase + extraTamano + extraIngredientes,
+    cantidad: 1,
+    mods: document.getElementById('previewMods').textContent,
+    notas: document.getElementById('notasCliente').value
+  };
+
+  // Guardar en carrito local
+  const carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+  carrito.push(item);
+  sessionStorage.setItem('carrito', JSON.stringify(carrito));
+
+  // TODO: POST /api/carrito/agregar → sincronizar con backend (sesión de kiosco)
+  console.log('Agregar al carrito:', item);
+  window.location.href = 's5-carrito.html';
+}
+</script>
+</body>
+</html>

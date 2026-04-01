@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleado — E3 Detalle de Orden</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:600px;}
+.left{background:var(--espresso);padding:24px;color:#fff;}
+.left .back{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:var(--cream);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:20px;display:inline-block;text-decoration:none;}
+.left .back:hover{background:rgba(255,255,255,.2);}
+.left h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:4px;}
+.left .sub{font-size:12px;color:var(--warm);margin-bottom:20px;}
+.info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+.info-row:last-of-type{border-bottom:none;}
+.il{font-size:12px;color:var(--warm);}
+.iv{font-size:13px;font-weight:600;}
+.actions{display:flex;flex-direction:column;gap:8px;margin-top:24px;}
+.act-btn{padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:none;text-align:center;transition:all .15s;}
+.act-start{background:var(--success);color:#fff;}
+.act-start:hover{background:#2d6236;}
+.act-ready{background:var(--gold);color:var(--espresso);}
+.act-ready:hover{opacity:.9;}
+.act-issue{background:rgba(255,255,255,.1);color:var(--warm);border:1px solid rgba(255,255,255,.15);}
+.act-issue:hover{background:rgba(255,255,255,.2);}
+.right{padding:24px;background:var(--cream);}
+.right h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;}
+.recipe-item{background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:12px 14px;margin-bottom:8px;}
+.ri-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ri-em{font-size:22px;}
+.ri-name{font-size:14px;font-weight:600;}
+.ri-mod{font-size:12px;color:var(--latte);}
+.ri-ings{display:flex;flex-wrap:wrap;gap:6px;}
+.ri-ing{background:var(--espresso);color:var(--cream);border-radius:10px;padding:3px 10px;font-size:11px;}
+.notes-box{background:#fdf4e3;border-left:3px solid var(--caramel);border-radius:12px;padding:12px 14px;margin-top:16px;}
+.notes-box .nl{font-size:11px;color:var(--caramel);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.notes-box p{font-size:13px;color:var(--roast);}
+.estado-badge{display:inline-block;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="layout">
+    <div class="left">
+      <a class="back" href="e2-cola.html">← Cola</a>
+      <h2 id="ordenTitulo">Orden #251</h2>
+      <div class="sub" id="ordenSub">Kiosco · 10:30 am</div>
+
+      <div class="info-row"><span class="il">Canal</span><span class="iv" id="infoCanal">Kiosco</span></div>
+      <div class="info-row"><span class="il">Código recogida</span><span class="iv" id="infoCodigo" style="color:var(--gold)">CNH-251</span></div>
+      <div class="info-row"><span class="il">Tiempo espera</span><span class="iv" id="infoTiempo" style="color:#ffd97a">4:20 min ⚠️</span></div>
+      <div class="info-row"><span class="il">Total pagado</span><span class="iv" id="infoTotal">$194 MXN</span></div>
+      <div class="info-row"><span class="il">Pago</span><span class="iv" id="infoPago">✓ Tarjeta</span></div>
+
+      <div class="actions">
+        <button class="act-btn act-start" id="btnIniciar">▶ Iniciar preparación</button>
+        <button class="act-btn act-ready" id="btnLista">✅ Marcar como lista</button>
+        <button class="act-btn act-issue" id="btnProblema" onclick="window.location.href='e5-reporte.html?orden=251'">⚠️ Reportar problema</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <h3>Receta completa</h3>
+
+      <div class="recipe-item" id="receta1">
+        <div class="ri-top">
+          <span class="ri-em">☕</span>
+          <span class="ri-name">Americano Negro</span>
+          <span class="ri-mod">×2 · Chico</span>
+        </div>
+        <div class="ri-ings">
+          <span class="ri-ing">2 shots espresso</span>
+          <span class="ri-ing">120ml agua caliente</span>
+          <span class="ri-ing">Sin azúcar</span>
+        </div>
+      </div>
+
+      <div class="recipe-item" id="receta2">
+        <div class="ri-top">
+          <span class="ri-em">🧋</span>
+          <span class="ri-name">Frappé Caramelo</span>
+          <span class="ri-mod">×1 · Grande</span>
+        </div>
+        <div class="ri-ings">
+          <span class="ri-ing">2 shots espresso</span>
+          <span class="ri-ing">200ml leche entera</span>
+          <span class="ri-ing">150g hielo</span>
+          <span class="ri-ing">30ml sirope caramelo</span>
+          <span class="ri-ing">Crema chantilly</span>
+        </div>
+      </div>
+
+      <div class="notes-box">
+        <div class="nl">⚠️ Nota del cliente</div>
+        <p id="notasCliente">Un americano sin azúcar, el otro con una pizca. El frappé extra dulce por favor.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/ordenes/:id → { id, canal, codigo, tiempoEspera, total, pago, items:[...], notas }
+// PATCH /api/ordenes/:id/estado → { estado: 'preparando'|'lista'|'entregada' }
+
+// Leer orden de URL params
+const params = new URLSearchParams(window.location.search);
+const ordenId = params.get('orden') || '251';
+document.getElementById('ordenTitulo').textContent = `Orden #${ordenId}`;
+document.getElementById('infoCodigo').textContent = `CNH-${ordenId}`;
+// TODO: fetch(`/api/ordenes/${ordenId}`).then(r=>r.json()).then(renderDetalle)
+
+let estadoActual = 'pendiente'; // pendiente | preparando | lista | entregada
+
+document.getElementById('btnIniciar').addEventListener('click', () => {
+  // TODO: fetch(`/api/ordenes/${ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado:'preparando' }) })
+  estadoActual = 'preparando';
+  document.getElementById('btnIniciar').style.opacity = '0.5';
+  document.getElementById('btnIniciar').disabled = true;
+  console.log('Iniciar preparación orden:', ordenId);
+});
+
+document.getElementById('btnLista').addEventListener('click', () => {
+  // TODO: fetch(`/api/ordenes/${ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado:'lista' }) })
+  estadoActual = 'lista';
+  console.log('Marcar lista orden:', ordenId);
+  window.location.href = 'e2-cola.html';
+});
+</script>
+</body>
+</html>

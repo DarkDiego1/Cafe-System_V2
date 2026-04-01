@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S6 Pago</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
+.pay-section{padding:16px 24px 12px;}
+.pay-section h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:14px;}
+.pay-method{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;transition:all .15s;}
+.pay-method.active{border-color:var(--caramel);background:#fdf4e3;box-shadow:0 0 0 3px rgba(196,127,43,.15);}
+.pm-icon{font-size:24px;width:36px;text-align:center;}
+.pm-label{font-size:15px;font-weight:500;}
+.pm-sub{font-size:12px;color:var(--latte);}
+.pm-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;}
+.pay-method.active .pm-check{background:var(--caramel);border-color:var(--caramel);color:#fff;}
+.card-fields{background:var(--mist);border:1px solid var(--warm);border-radius:14px;padding:14px;margin:10px 24px;}
+.card-fields .field{margin-bottom:10px;}
+.card-fields label{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--latte);}
+.card-fields input{width:100%;background:var(--cream);border:1.5px solid var(--warm);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--espresso);font-family:'DM Sans',sans-serif;outline:none;margin-top:4px;}
+.card-fields input:focus{border-color:var(--caramel);}
+.card-row{display:flex;gap:8px;}
+.card-row .field{flex:1;}
+.tip-section{padding:0 24px;margin-bottom:16px;}
+.tip-section h3{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+.tip-row{display:flex;gap:8px;}
+.tip-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:10px;padding:10px 8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit;}
+.tip-btn.active{border-color:var(--caramel);background:#fdf4e3;color:var(--caramel);}
+.pay-total{padding:14px 24px 4px;background:var(--foam);border-top:1px solid var(--warm);margin-top:auto;}
+.total-row{display:flex;justify-content:space-between;font-size:18px;font-weight:600;color:var(--espresso);margin-bottom:14px;}
+.total-row span:last-child{color:var(--caramel);}
+.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;margin-top:0;transition:background .15s;font-family:inherit;}
+.btn-full:hover{background:var(--roast);}
+.btn-full.gold{background:var(--gold);color:var(--espresso);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='s5-carrito.html'">←</button>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <span style="font-size:13px;color:var(--latte)">Pago seguro 🔒</span>
+  </div>
+
+  <div class="pay-section">
+    <h2>Método de pago</h2>
+    <div class="pay-method active" id="pm-tarjeta" onclick="selPM('tarjeta')">
+      <div class="pm-icon">💳</div>
+      <div><div class="pm-label">Tarjeta</div><div class="pm-sub">Crédito o débito</div></div>
+      <div class="pm-check">✓</div>
+    </div>
+    <div class="pay-method" id="pm-digital" onclick="selPM('digital')">
+      <div class="pm-icon">📱</div>
+      <div><div class="pm-label">Billetera digital</div><div class="pm-sub">Apple Pay · Google Pay</div></div>
+      <div class="pm-check"></div>
+    </div>
+    <div class="pay-method" id="pm-efectivo" onclick="selPM('efectivo')">
+      <div class="pm-icon">💵</div>
+      <div><div class="pm-label">Efectivo</div><div class="pm-sub">Pago en caja</div></div>
+      <div class="pm-check"></div>
+    </div>
+    <div class="pay-method" id="pm-lealtad" onclick="selPM('lealtad')">
+      <div class="pm-icon">🏷️</div>
+      <div><div class="pm-label">Puntos de lealtad</div><div class="pm-sub" id="puntosDisp">2,480 pts disponibles</div></div>
+      <div class="pm-check"></div>
+    </div>
+  </div>
+
+  <!-- Campos de tarjeta (se ocultan según método) -->
+  <div class="card-fields" id="camposTarjeta">
+    <div class="field">
+      <label>Número de tarjeta</label>
+      <input type="text" id="numTarjeta" placeholder="4242 4242 4242 4242" maxlength="19">
+    </div>
+    <div class="card-row">
+      <div class="field"><label>Vencimiento</label><input type="text" id="vencimiento" placeholder="MM/AA" maxlength="5"></div>
+      <div class="field"><label>CVV</label><input type="text" id="cvv" placeholder="123" maxlength="4"></div>
+    </div>
+  </div>
+
+  <div class="tip-section">
+    <h3>¿Quieres dejar propina?</h3>
+    <div class="tip-row">
+      <div class="tip-btn" onclick="selTip(this,0)">Sin propina</div>
+      <div class="tip-btn active" id="tipActual" onclick="selTip(this,10)">10%</div>
+      <div class="tip-btn" onclick="selTip(this,15)">15%</div>
+      <div class="tip-btn" onclick="selTip(this,20)">20%</div>
+    </div>
+  </div>
+
+  <div class="pay-total">
+    <div class="total-row">
+      <span>Total a pagar</span>
+      <span id="totalPagar">$207.80</span>
+    </div>
+    <button class="btn-full gold" id="btnPagar" onclick="procesarPago()">Pagar $207.80 →</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// POST /api/pago/procesar → { metodo, datosMetodo, propina, total } → { exito, ordenId, codigo }
+// GET /api/cliente/puntos → { disponibles } (requiere sesión de lealtad)
+
+let metodoPago = 'tarjeta';
+let porcentajePropina = 10;
+const subtotal = 188;
+
+function calcularTotal() {
+  const propina = subtotal * porcentajePropina / 100;
+  return (subtotal + propina).toFixed(2);
+}
+
+function actualizarTotal() {
+  const total = calcularTotal();
+  document.getElementById('totalPagar').textContent = `$${total}`;
+  document.getElementById('btnPagar').textContent = `Pagar $${total} →`;
+}
+
+function selPM(metodo) {
+  metodoPago = metodo;
+  document.querySelectorAll('.pay-method').forEach(pm => {
+    pm.classList.remove('active');
+    pm.querySelector('.pm-check').textContent = '';
+  });
+  document.getElementById(`pm-${metodo}`).classList.add('active');
+  document.getElementById(`pm-${metodo}`).querySelector('.pm-check').textContent = '✓';
+  // Mostrar/ocultar campos de tarjeta
+  document.getElementById('camposTarjeta').style.display = metodo === 'tarjeta' ? 'block' : 'none';
+}
+
+function selTip(el, pct) {
+  document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  porcentajePropina = pct;
+  actualizarTotal();
+}
+
+function procesarPago() {
+  const datos = {
+    metodo: metodoPago,
+    propina: porcentajePropina,
+    total: calcularTotal(),
+    ...(metodoPago === 'tarjeta' && {
+      numTarjeta: document.getElementById('numTarjeta').value.replace(/\s/g,''),
+      vencimiento: document.getElementById('vencimiento').value,
+      cvv: document.getElementById('cvv').value
+    })
+  };
+  // TODO: fetch('/api/pago/procesar', { method:'POST', body: JSON.stringify(datos) })
+  //   .then(r=>r.json())
+  //   .then(data => { if(data.exito) window.location.href=`s7-confirmacion.html?orden=${data.ordenId}`; })
+  console.log('Procesar pago:', datos);
+  window.location.href = 's7-confirmacion.html'; // demo
+}
+
+// Formateo automático de tarjeta
+document.getElementById('numTarjeta').addEventListener('input', (e) => {
+  e.target.value = e.target.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
+});
+document.getElementById('vencimiento').addEventListener('input', (e) => {
+  e.target.value = e.target.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/, '$1/$2');
+});
+
+actualizarTotal();
+</script>
+</body>
+</html>

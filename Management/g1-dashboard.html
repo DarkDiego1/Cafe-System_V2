@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerente — G1 Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.page-top{background:var(--espresso);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.page-top h2{font-family:'Playfair Display',serif;color:var(--cream);font-size:22px;}
+.page-top p{color:var(--warm);font-size:12px;margin-top:2px;}
+.page-top .actions{display:flex;gap:8px;}
+.btn-p{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-p:hover{background:var(--roast);}
+.btn-p.gold{background:var(--gold);color:var(--espresso);}
+.btn-ghost{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--cream);border-radius:10px;padding:9px 16px;font-size:12px;cursor:pointer;font-family:inherit;}
+.section-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px;}
+.kpi{background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px;}
+.kpi .kv{font-family:'Playfair Display',serif;font-size:26px;color:var(--espresso);margin-bottom:2px;}
+.kpi .kl{font-size:11px;color:var(--latte);}
+.kpi .kd{font-size:12px;margin-top:4px;font-weight:600;}
+.kpi .kd.up{color:var(--success);}
+.kpi .kd.dn{color:var(--danger);}
+.kpi .kd.neu{color:var(--caramel);}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:8px 12px;background:var(--mist);text-align:left;}
+tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--warm);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--mist);}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;}
+.b-ok{background:#e8f5eb;color:var(--success);}
+.b-warn{background:#fdf4e3;color:var(--caramel);}
+.b-err{background:#fce8e6;color:var(--danger);}
+.b-gray{background:var(--mist);color:var(--latte);}
+.alert-box{background:#fdf4e3;border-left:3px solid var(--caramel);border-radius:12px;padding:12px 16px;margin:16px 20px;display:flex;align-items:center;gap:10px;}
+.alert-box.err{background:#fce8e6;border-left-color:var(--danger);}
+.ab-ico{font-size:18px;flex-shrink:0;}
+.ab-txt{font-size:13px;font-weight:600;color:var(--caramel);}
+.ab-txt.err{color:var(--danger);}
+.ab-sub{font-size:12px;color:var(--roast);margin-top:2px;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:90px;padding:0 4px;}
+.bc-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--caramel),var(--gold));}
+.bc-lbl{font-size:9px;color:var(--latte);text-align:center;margin-top:4px;}
+.live-bar{background:linear-gradient(90deg,var(--espresso),var(--roast));padding:10px 24px;display:flex;align-items:center;gap:14px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#6bffa0;flex-shrink:0;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.live-bar span{font-size:12px;color:var(--warm);}
+.live-bar strong{color:var(--cream);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="page-top">
+    <div><h2>Dashboard</h2><p>Martes 17 mar 2026 · Turno mañana</p></div>
+    <div class="actions">
+      <button class="btn-ghost" id="btnExportar">↓ Exportar</button>
+      <button class="btn-p gold" id="btnReportes">Ver reportes</button>
+    </div>
+  </div>
+
+  <div class="alert-box err">
+    <div class="ab-ico">⚠️</div>
+    <div>
+      <div class="ab-txt err">Leche de avena al 12% de stock</div>
+      <div class="ab-sub">Umbral crítico: 15%. Generar orden de compra automática.</div>
+    </div>
+    <button class="btn-p" id="btnOrdenar" style="margin-left:auto;flex-shrink:0;font-size:11px">Ordenar ahora</button>
+  </div>
+
+  <div class="live-bar">
+    <div class="live-dot"></div>
+    <span>En tiempo real:</span>
+    <strong id="ordenesActivas">8 órdenes activas</strong>
+    <span>·</span>
+    <strong id="baristasActivos">3 baristas</strong>
+    <span>·</span>
+    <strong id="tiempoProm">Tiempo prom: 7 min</strong>
+  </div>
+
+  <div class="kpi-grid" style="padding-bottom:0">
+    <div class="kpi"><div class="kv" id="kpiVentas">$14,280</div><div class="kl">Ventas hoy</div><div class="kd up">↑ +12% vs ayer</div></div>
+    <div class="kpi"><div class="kv" id="kpiOrdenes">142</div><div class="kl">Órdenes hoy</div><div class="kd up">↑ +8 vs ayer</div></div>
+    <div class="kpi"><div class="kv" id="kpiTicket">$100</div><div class="kl">Ticket promedio</div><div class="kd neu">→ Sin cambio</div></div>
+    <div class="kpi"><div class="kv" id="kpiTiempo">7.2 min</div><div class="kl">Tiempo espera</div><div class="kd dn">↑ +0.5 min</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px 20px">
+    <div style="background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px">
+      <p class="section-label" style="margin-bottom:10px">📊 Ventas por hora</p>
+      <div class="bar-chart" id="barChart">
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:40%"></div><div class="bc-lbl">7am</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:75%"></div><div class="bc-lbl">8am</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:90%"></div><div class="bc-lbl">9am</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:60%"></div><div class="bc-lbl">10am</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:45%"></div><div class="bc-lbl">11am</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:30%"></div><div class="bc-lbl">12pm</div></div>
+      </div>
+    </div>
+    <div style="background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px">
+      <p class="section-label" style="margin-bottom:12px">🥧 Canales de venta</p>
+      <div style="display:flex;flex-direction:column;gap:8px" id="canalesVenta">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">Kiosco</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:52%;height:8px;background:var(--caramel);border-radius:10px"></div></div><strong>52%</strong></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">App Móvil</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:35%;height:8px;background:var(--success);border-radius:10px"></div></div><strong>35%</strong></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">Mostrador</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:13%;height:8px;background:var(--latte);border-radius:10px"></div></div><strong>13%</strong></div>
+      </div>
+      <div style="height:1px;background:var(--warm);margin:14px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--latte)">Órdenes a tiempo</span><strong style="color:var(--success)" id="kpiATiempo">87%</strong></div>
+    </div>
+  </div>
+
+  <div style="padding:0 20px 24px">
+    <p class="section-label">Actividad reciente</p>
+    <table id="tablaActividad">
+      <thead><tr><th>Hora</th><th>Evento</th><th>Usuario</th><th>Módulo</th></tr></thead>
+      <tbody>
+        <tr><td>10:34</td><td>Orden #251 recibida</td><td>Sistema</td><td><span class="badge b-gray">Kiosco</span></td></tr>
+        <tr><td>10:32</td><td>Orden #247 entregada</td><td>Ana López</td><td><span class="badge b-ok">Barista</span></td></tr>
+        <tr><td>10:30</td><td>Precio Frappé ajustado +$5</td><td>Carlos G.</td><td><span class="badge b-warn">Gerente</span></td></tr>
+        <tr><td>10:28</td><td>Leche avena: alerta crítica</td><td>Sistema</td><td><span class="badge b-err">Inventario</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+// Puntos de integración con backend:
+// GET /api/dashboard/kpis → { ventas, ordenes, ticket, tiempoEspera }
+// GET /api/dashboard/actividad → [{ hora, evento, usuario, modulo }]
+// GET /api/dashboard/canales → [{ nombre, porcentaje }]
+// GET /api/inventario/alertas → alertas críticas
+// POST /api/inventario/ordenar → genera orden de compra
+document.getElementById('btnOrdenar').addEventListener('click', () => {
+  // TODO: POST /api/inventario/ordenar
+  alert('Orden de compra generada (conectar backend)');
+});
+document.getElementById('btnExportar').addEventListener('click', () => {
+  // TODO: GET /api/dashboard/exportar
+});
+document.getElementById('btnReportes').addEventListener('click', () => {
+  // TODO: navegar a g6-reportes.html
+  window.location.href = 'g6-reportes.html';
+});
+</script>
+</body>
+</html>

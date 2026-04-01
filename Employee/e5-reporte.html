@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleado — E5 Reportar Problema</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.btn-o{background:none;border:1.5px solid var(--warm);color:var(--espresso);border-radius:12px;padding:8px 14px;font-size:14px;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;}
+.btn-o:hover{border-color:var(--caramel);}
+.body{padding:20px;flex:1;}
+.section-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+.btn-p{background:var(--espresso);color:var(--cream);border:none;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-p:hover{background:var(--roast);}
+.types{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.tp{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--foam);border:1.5px solid var(--warm);border-radius:14px;cursor:pointer;transition:all .15s;}
+.tp.act{border-color:var(--caramel);background:#fdf4e3;}
+.tp:hover{border-color:var(--caramel);}
+.tp .ti{font-size:22px;flex-shrink:0;}
+.tp .td{flex:1;}
+.tp .tn{font-size:13px;font-weight:600;}
+.tp .ts{font-size:11px;color:var(--latte);}
+.sev{display:flex;gap:8px;margin-bottom:16px;}
+.sv{flex:1;padding:10px;border:1.5px solid var(--warm);border-radius:10px;background:var(--mist);font-size:12px;font-weight:600;cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
+.sv:hover{border-color:var(--caramel);}
+.sv.act-low{border-color:var(--success);background:#e8f5eb;color:var(--success);}
+.sv.act-med{border-color:var(--caramel);background:#fdf4e3;color:var(--caramel);}
+.sv.act-hi{border-color:var(--danger);background:#fce8e6;color:var(--danger);}
+textarea{width:100%;background:var(--mist);border:1.5px solid var(--warm);border-radius:12px;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;height:80px;outline:none;margin-bottom:14px;color:var(--espresso);}
+textarea:focus{border-color:var(--caramel);}
+.ac{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.aa{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--foam);border:1.5px solid var(--warm);border-radius:12px;cursor:pointer;transition:all .15s;}
+.aa.act{border-color:var(--success);background:#e8f5eb;}
+.aa:hover{border-color:var(--caramel);}
+.aa .ai{font-size:18px;flex-shrink:0;}
+.aa p{font-size:13px;font-weight:500;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <a class="btn-o" id="btnVolver" href="e3-detalle.html">←</a>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <span style="width:48px"></span>
+  </div>
+
+  <div class="body">
+    <p style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:4px;">Reportar Problema</p>
+    <p style="font-size:12px;color:var(--latte);margin-bottom:16px;" id="subtituloOrden">Orden #251 · 10:34 am</p>
+
+    <p class="section-label">Tipo de problema</p>
+    <div class="types" id="tiposContainer">
+      <div class="tp act" data-tipo="ingrediente">
+        <span class="ti">🥛</span>
+        <div class="td"><div class="tn">Ingrediente agotado</div><div class="ts">Falta insumo para completar</div></div>
+        <span style="color:var(--caramel);font-weight:700" class="check">✓</span>
+      </div>
+      <div class="tp" data-tipo="equipo">
+        <span class="ti">🔧</span>
+        <div class="td"><div class="tn">Equipo con falla</div><div class="ts">Máquina o herramienta dañada</div></div>
+      </div>
+      <div class="tp" data-tipo="error">
+        <span class="ti">⚠️</span>
+        <div class="td"><div class="tn">Error en orden</div><div class="ts">Datos incorrectos</div></div>
+      </div>
+      <div class="tp" data-tipo="especial">
+        <span class="ti">🙋</span>
+        <div class="td"><div class="tn">Solicitud especial</div><div class="ts">Fuera de menú</div></div>
+      </div>
+    </div>
+
+    <p class="section-label">Severidad</p>
+    <div class="sev" id="sevContainer">
+      <div class="sv act-low" data-sev="baja">🟢 Baja</div>
+      <div class="sv" data-sev="media">🟡 Media</div>
+      <div class="sv" data-sev="alta">🔴 Alta</div>
+    </div>
+
+    <p class="section-label">Descripción</p>
+    <textarea id="descripcion" placeholder="Ej: Se acabó la leche de avena, el cliente había pedido Matcha Latte con avena…"></textarea>
+
+    <p class="section-label">Acción tomada</p>
+    <div class="ac" id="accionesContainer">
+      <div class="aa act" data-accion="sustitucion">
+        <span class="ai">🔄</span>
+        <p>Sustitución de ingrediente (con aviso al cliente)</p>
+      </div>
+      <div class="aa" data-accion="pausar">
+        <span class="ai">⏸️</span>
+        <p>Pausar orden hasta resolución</p>
+      </div>
+      <div class="aa" data-accion="cancelar">
+        <span class="ai">❌</span>
+        <p>Cancelar orden y notificar cliente</p>
+      </div>
+      <div class="aa" data-accion="escalar">
+        <span class="ai">👆</span>
+        <p>Escalar al gerente</p>
+      </div>
+    </div>
+
+    <button class="btn-p" id="btnEnviar" style="width:100%">Enviar Reporte →</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// POST /api/ordenes/:id/problema → { tipo, severidad, descripcion, accion } → { reporteId }
+// El backend notifica al gerente si la severidad es alta o se escala
+
+const params = new URLSearchParams(window.location.search);
+const ordenId = params.get('orden') || '251';
+document.getElementById('subtituloOrden').textContent = `Orden #${ordenId} · ${new Date().toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'})}`;
+document.getElementById('btnVolver').href = `e3-detalle.html?orden=${ordenId}`;
+
+let tipoSeleccionado = 'ingrediente';
+let sevSeleccionada = 'baja';
+let accionSeleccionada = 'sustitucion';
+
+document.querySelectorAll('.tp').forEach(tp => {
+  tp.addEventListener('click', function() {
+    document.querySelectorAll('.tp').forEach(x => { x.classList.remove('act'); x.querySelector('.check') && (x.querySelector('.check').remove()); });
+    this.classList.add('act');
+    tipoSeleccionado = this.dataset.tipo;
+    const check = document.createElement('span');
+    check.className = 'check';
+    check.style.cssText = 'color:var(--caramel);font-weight:700';
+    check.textContent = '✓';
+    this.appendChild(check);
+  });
+});
+
+document.querySelectorAll('.sv').forEach(sv => {
+  sv.addEventListener('click', function() {
+    document.querySelectorAll('.sv').forEach(x => x.className = 'sv');
+    sevSeleccionada = this.dataset.sev;
+    const clases = { baja:'act-low', media:'act-med', alta:'act-hi' };
+    this.classList.add(clases[sevSeleccionada]);
+  });
+});
+
+document.querySelectorAll('.aa').forEach(aa => {
+  aa.addEventListener('click', function() {
+    document.querySelectorAll('.aa').forEach(x => x.classList.remove('act'));
+    this.classList.add('act');
+    accionSeleccionada = this.dataset.accion;
+  });
+});
+
+document.getElementById('btnEnviar').addEventListener('click', () => {
+  const reporte = {
+    ordenId,
+    tipo: tipoSeleccionado,
+    severidad: sevSeleccionada,
+    descripcion: document.getElementById('descripcion').value,
+    accion: accionSeleccionada
+  };
+  // TODO: fetch(`/api/ordenes/${ordenId}/problema`, { method:'POST', body: JSON.stringify(reporte) })
+  //   .then(r=>r.json()).then(data => window.location.href='e2-cola.html')
+  console.log('Enviar reporte:', reporte);
+});
+</script>
+</body>
+</html>

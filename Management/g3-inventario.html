@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerente — G3 Inventario</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.page-top{background:var(--espresso);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.page-top h2{font-family:'Playfair Display',serif;color:var(--cream);font-size:22px;}
+.page-top p{color:var(--warm);font-size:12px;margin-top:2px;}
+.page-top .actions{display:flex;gap:8px;}
+.btn-p{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-p:hover{background:var(--roast);}
+.btn-p.gold{background:var(--gold);color:var(--espresso);}
+.btn-ghost{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--cream);border-radius:10px;padding:9px 16px;font-size:12px;cursor:pointer;font-family:inherit;}
+.alert-box{background:#fdf4e3;border-left:3px solid var(--caramel);border-radius:12px;padding:12px 16px;margin:16px 20px;display:flex;align-items:center;gap:10px;}
+.alert-box.err{background:#fce8e6;border-left-color:var(--danger);}
+.ab-ico{font-size:18px;flex-shrink:0;}
+.ab-txt{font-size:13px;font-weight:600;color:var(--caramel);}
+.ab-txt.err{color:var(--danger);}
+.ab-sub{font-size:12px;color:var(--roast);margin-top:2px;}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:8px 12px;background:var(--mist);text-align:left;}
+tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--warm);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--mist);}
+.badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;}
+.b-ok{background:#e8f5eb;color:var(--success);}
+.b-warn{background:#fdf4e3;color:var(--caramel);}
+.b-err{background:#fce8e6;color:var(--danger);}
+.bar-wrap{background:var(--warm);border-radius:10px;height:6px;width:100px;display:inline-block;vertical-align:middle;}
+.bar-fill{height:6px;border-radius:10px;}
+.bf-ok{background:var(--success);}
+.bf-warn{background:var(--caramel);}
+.bf-err{background:var(--danger);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="page-top">
+    <div><h2>Inventario</h2><p>UC50–56 · RF66 orden automática</p></div>
+    <div class="actions">
+      <button class="btn-ghost" id="btnAddInsumo">+ Insumo</button>
+      <button class="btn-p gold" id="btnGenCompra">Generar compra</button>
+    </div>
+  </div>
+
+  <div class="alert-box err" style="margin:16px 20px">
+    <div class="ab-ico">⚠️</div>
+    <div>
+      <div class="ab-txt err">2 insumos en nivel crítico</div>
+      <div class="ab-sub">Leche de avena y sirope de caramelo. Orden automática pendiente de aprobación.</div>
+    </div>
+    <button class="btn-p" id="btnAprobarOrden" style="margin-left:auto;flex-shrink:0;font-size:11px">Aprobar orden</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 20px 16px">
+    <div style="background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--success)" id="cntOK">38</div>
+      <div style="font-size:11px;color:var(--latte)">Insumos OK</div>
+    </div>
+    <div style="background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--caramel)" id="cntBajo">5</div>
+      <div style="font-size:11px;color:var(--latte)">Stock bajo</div>
+    </div>
+    <div style="background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:14px;text-align:center">
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--danger)" id="cntCritico">2</div>
+      <div style="font-size:11px;color:var(--latte)">Críticos</div>
+    </div>
+  </div>
+
+  <div style="padding:0 20px 24px">
+    <table id="tablaInventario">
+      <thead>
+        <tr><th>Insumo</th><th>Categoría</th><th>Stock actual</th><th>Nivel</th><th>Umbral</th><th>Estado</th></tr>
+      </thead>
+      <tbody id="tbodyInventario">
+        <tr>
+          <td>Leche de avena</td><td>Lácteos alt.</td><td>1.2 L</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-err" style="width:12%"></div></div></td>
+          <td>10 L</td><td><span class="badge b-err">Crítico</span></td>
+        </tr>
+        <tr>
+          <td>Sirope caramelo</td><td>Saborizantes</td><td>180 ml</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-err" style="width:18%"></div></div></td>
+          <td>1 L</td><td><span class="badge b-err">Crítico</span></td>
+        </tr>
+        <tr>
+          <td>Café espresso blend</td><td>Café</td><td>2.8 kg</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-warn" style="width:35%"></div></div></td>
+          <td>5 kg</td><td><span class="badge b-warn">Bajo</span></td>
+        </tr>
+        <tr>
+          <td>Leche entera</td><td>Lácteos</td><td>18 L</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-ok" style="width:72%"></div></div></td>
+          <td>25 L</td><td><span class="badge b-ok">OK</span></td>
+        </tr>
+        <tr>
+          <td>Crema chantilly</td><td>Decoración</td><td>4 botes</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-ok" style="width:80%"></div></div></td>
+          <td>5 botes</td><td><span class="badge b-ok">OK</span></td>
+        </tr>
+        <tr>
+          <td>Cacao en polvo</td><td>Saborizantes</td><td>800 g</td>
+          <td><div class="bar-wrap"><div class="bar-fill bf-ok" style="width:65%"></div></div></td>
+          <td>1.2 kg</td><td><span class="badge b-ok">OK</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/inventario → [{ id, nombre, categoria, stock, unidad, umbral, estado }]
+// POST /api/inventario/insumo → crear nuevo insumo
+// POST /api/inventario/orden → generar/aprobar orden de compra
+document.getElementById('btnAprobarOrden').addEventListener('click', () => {
+  // TODO: POST /api/inventario/orden/aprobar
+  console.log('Aprobar orden automática');
+});
+document.getElementById('btnGenCompra').addEventListener('click', () => {
+  // TODO: POST /api/inventario/orden/generar
+  console.log('Generar orden de compra manual');
+});
+document.getElementById('btnAddInsumo').addEventListener('click', () => {
+  // TODO: abrir modal/formulario de nuevo insumo
+  console.log('Agregar insumo');
+});
+</script>
+</body>
+</html>

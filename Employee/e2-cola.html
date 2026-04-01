@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleado — E2 Cola de Órdenes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.btn-o{background:none;border:1.5px solid var(--warm);color:var(--espresso);border-radius:12px;padding:9px 16px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.btn-o:hover{border-color:var(--caramel);}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px;flex:1;}
+.col-h{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:8px 10px;border-radius:10px;margin-bottom:8px;text-align:center;}
+.col-pend .col-h{background:rgba(196,127,43,.12);color:var(--caramel);}
+.col-prep .col-h{background:rgba(196,100,43,.12);color:#c4642b;}
+.col-list .col-h{background:rgba(58,125,68,.12);color:var(--success);}
+.col-ent .col-h{background:rgba(44,26,14,.08);color:var(--latte);}
+.kcard{background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer;border-left:3px solid var(--warm);transition:transform .15s;}
+.kcard:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,26,14,.1);}
+.kcard.pend{border-left-color:var(--caramel);}
+.kcard.prep{border-left-color:#c4642b;}
+.kcard.list{border-left-color:var(--success);}
+.kcard.ent{border-left-color:var(--warm);opacity:.65;}
+.kcard .cn{font-size:13px;font-weight:600;margin-bottom:2px;}
+.kcard .ci{font-size:11px;color:var(--latte);}
+.kcard .ct{font-size:12px;color:var(--roast);margin-top:6px;}
+.kcard .timer{display:inline-block;margin-top:6px;border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700;}
+.kcard .timer.ok{background:#e8f5eb;color:var(--success);}
+.kcard .timer.warn{background:#fdf4e3;color:var(--caramel);}
+.kcard .timer.over{background:#fce8e6;color:var(--danger);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:var(--latte)" id="infoUsuario">👨‍🍳 Ana López · Barista &nbsp;·&nbsp; 🕐 10:34 am</span>
+      <button class="btn-o" id="btnSalir" onclick="window.location.href='e1-login.html'">Salir</button>
+    </div>
+  </div>
+
+  <div style="padding:4px 16px 0">
+    <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--espresso);padding:8px 8px 0">Cola de Órdenes</p>
+  </div>
+
+  <div class="kanban" id="kanbanBoard">
+    <!-- Pendiente -->
+    <div class="col col-pend">
+      <div class="col-h">⏳ Pendiente <span id="cntPend">(3)</span></div>
+      <div class="kcard pend" data-orden="251" onclick="window.location.href='e3-detalle.html?orden=251'">
+        <div class="cn">Orden #251</div>
+        <div class="ci">Kiosco · Recién llegada</div>
+        <div class="ct">☕ Americano ×2<br>🧋 Frappé Caramelo</div>
+        <div class="timer warn">4:20 ⚠️</div>
+      </div>
+      <div class="kcard pend" data-orden="252" onclick="window.location.href='e3-detalle.html?orden=252'">
+        <div class="cn">Orden #252</div>
+        <div class="ci">App · 10:45 anticipado</div>
+        <div class="ct">🍵 Matcha Latte grande</div>
+        <div class="timer ok">1:10</div>
+      </div>
+      <div class="kcard pend" data-orden="253">
+        <div class="cn">Orden #253</div>
+        <div class="ci">Kiosco</div>
+        <div class="ct">☕ Cappuccino mediano</div>
+        <div class="timer ok">0:30</div>
+      </div>
+    </div>
+
+    <!-- Preparando -->
+    <div class="col col-prep">
+      <div class="col-h">🔥 Preparando <span id="cntPrep">(2)</span></div>
+      <div class="kcard prep" data-orden="248" onclick="window.location.href='e3-detalle.html?orden=248'">
+        <div class="cn">Orden #248</div>
+        <div class="ci">App · María G.</div>
+        <div class="ct">❄️ Cold Brew ×2</div>
+        <div class="timer warn">7:45</div>
+      </div>
+      <div class="kcard prep" data-orden="249">
+        <div class="cn">Orden #249</div>
+        <div class="ci">Kiosco</div>
+        <div class="ct">☕ Latte · Americano</div>
+        <div class="timer over">11:02 🔴</div>
+      </div>
+    </div>
+
+    <!-- Listas -->
+    <div class="col col-list">
+      <div class="col-h">✅ Listas <span id="cntList">(2)</span></div>
+      <div class="kcard list" data-orden="246">
+        <div class="cn">Orden #246</div>
+        <div class="ci">App · Carlos M.</div>
+        <div class="ct">☕ Espresso doble</div>
+        <div class="timer ok">Lista ✓</div>
+      </div>
+      <div class="kcard list" data-orden="247">
+        <div class="cn">Orden #247</div>
+        <div class="ci">Kiosco · CNH-247</div>
+        <div class="ct">☕ Cappuccino<br>🧋 Frappé ×2</div>
+        <div class="timer ok">Lista ✓</div>
+      </div>
+    </div>
+
+    <!-- Entregadas -->
+    <div class="col col-ent">
+      <div class="col-h">📦 Entregadas <span id="cntEnt">(5)</span></div>
+      <div class="kcard ent" data-orden="240">
+        <div class="cn">Orden #240</div>
+        <div class="ci">App</div>
+        <div class="ct">☕ Americano chico</div>
+      </div>
+      <div class="kcard ent" data-orden="241">
+        <div class="cn">Orden #241</div>
+        <div class="ci">Kiosco</div>
+        <div class="ct">🍵 Chai Latte</div>
+      </div>
+      <div class="kcard ent" data-orden="242">
+        <div class="cn">Orden #242</div>
+        <div class="ci">App</div>
+        <div class="ct">❄️ Frappé ×3</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Integración backend (WebSocket o polling):
+// GET /api/ordenes/cola → { pendiente:[...], preparando:[...], listas:[...], entregadas:[...] }
+// WS /ws/ordenes → actualizaciones en tiempo real
+// Polling cada 10s como fallback:
+// setInterval(() => fetch('/api/ordenes/cola').then(r=>r.json()).then(renderKanban), 10000)
+
+// Actualizar hora en tiempo real
+function actualizarHora() {
+  const ahora = new Date();
+  const h = ahora.getHours().toString().padStart(2,'0');
+  const m = ahora.getMinutes().toString().padStart(2,'0');
+  const ampm = ahora.getHours() >= 12 ? 'pm' : 'am';
+  const h12 = ahora.getHours() % 12 || 12;
+  document.getElementById('infoUsuario').innerHTML =
+    `👨‍🍳 Ana López · Barista &nbsp;·&nbsp; 🕐 ${h12}:${m} ${ampm}`;
+}
+actualizarHora();
+setInterval(actualizarHora, 60000);
+</script>
+</body>
+</html>

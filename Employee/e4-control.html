@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleado — E4 Control de Estado</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.btn-o{background:none;border:1.5px solid var(--warm);color:var(--espresso);border-radius:12px;padding:9px 16px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;text-decoration:none;display:inline-block;}
+.btn-o:hover{border-color:var(--caramel);}
+.toast{background:var(--espresso);color:var(--cream);border-radius:12px;padding:12px 20px;margin:0 16px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;}
+.toast .undo{background:var(--gold);color:var(--espresso);border:none;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.grid6{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px 24px;}
+.oc{border-radius:16px;overflow:hidden;border:1px solid var(--warm);}
+.oc .oh{padding:12px 14px;display:flex;justify-content:space-between;align-items:center;}
+.oc .on{font-size:13px;font-weight:700;}
+.oc .ot{font-size:11px;opacity:.8;}
+.oc .od{padding:10px 14px;background:var(--foam);}
+.oc .oi{font-size:12px;color:var(--latte);margin-bottom:8px;}
+.oc .ob-row{display:flex;gap:6px;}
+.oc .ob{flex:1;padding:8px;border:none;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;transition:background .15s;}
+.oc .ob:hover{filter:brightness(.9);}
+.oc.pend .oh{background:var(--caramel);color:#fff;}
+.oc.prep .oh{background:#c4642b;color:#fff;}
+.oc.list .oh{background:var(--success);color:#fff;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <div style="display:flex;gap:8px">
+      <a class="btn-o" href="e2-cola.html">← Ver Cola</a>
+    </div>
+  </div>
+
+  <div style="padding:0 16px">
+    <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--espresso);padding:12px 8px 8px">Control de Estado · Turno mañana</p>
+  </div>
+
+  <div class="toast" id="toastMensaje">
+    <span>↩ Estado de Orden #245 cambiado a "Lista"</span>
+    <button class="undo" id="btnDeshacer">Deshacer (5s)</button>
+  </div>
+
+  <div class="grid6" id="gridOrdenes">
+    <div class="oc pend" data-orden="251">
+      <div class="oh"><span class="on">#251</span><span class="ot">4:20 ⚠️</span></div>
+      <div class="od">
+        <div class="oi">Americano ×2 · Frappé</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#e8f5eb;color:var(--success)" onclick="cambiarEstado('251','preparando')">▶ Iniciar</div>
+          <div class="ob" style="background:#fce8e6;color:var(--danger)" onclick="window.location.href='e5-reporte.html?orden=251'">⚠️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oc prep" data-orden="248">
+      <div class="oh"><span class="on">#248</span><span class="ot">7:45</span></div>
+      <div class="od">
+        <div class="oi">Cold Brew ×2 · Grande</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#e8f5eb;color:var(--success)" onclick="cambiarEstado('248','lista')">✅ Lista</div>
+          <div class="ob" style="background:#fce8e6;color:var(--danger)" onclick="window.location.href='e5-reporte.html?orden=248'">⚠️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oc list" data-orden="246">
+      <div class="oh"><span class="on">#246</span><span class="ot">Lista ✓</span></div>
+      <div class="od">
+        <div class="oi">Espresso doble · Chico</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#fdf4e3;color:var(--caramel)" onclick="llamarCliente('246')">📢 Llamar</div>
+          <div class="ob" style="background:var(--mist);color:var(--latte)" onclick="cambiarEstado('246','entregada')">✓ Entregada</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oc list" data-orden="247">
+      <div class="oh"><span class="on">#247</span><span class="ot">Lista ✓</span></div>
+      <div class="od">
+        <div class="oi">Cappuccino · Frappé ×2</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#fdf4e3;color:var(--caramel)" onclick="llamarCliente('247')">📢 Llamar</div>
+          <div class="ob" style="background:var(--mist);color:var(--latte)" onclick="cambiarEstado('247','entregada')">✓ Entregada</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oc pend" data-orden="252">
+      <div class="oh"><span class="on">#252</span><span class="ot">1:10</span></div>
+      <div class="od">
+        <div class="oi">Matcha Latte · Avena</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#e8f5eb;color:var(--success)" onclick="cambiarEstado('252','preparando')">▶ Iniciar</div>
+          <div class="ob" style="background:#fce8e6;color:var(--danger)" onclick="window.location.href='e5-reporte.html?orden=252'">⚠️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oc prep" data-orden="249" style="opacity:.6">
+      <div class="oh"><span class="on">#249</span><span class="ot" style="color:#ffcccc">11:02 🔴</span></div>
+      <div class="od">
+        <div class="oi">Latte doble · Americano</div>
+        <div class="ob-row">
+          <div class="ob" style="background:#e8f5eb;color:var(--success)" onclick="cambiarEstado('249','lista')">✅ Lista</div>
+          <div class="ob" style="background:#fce8e6;color:var(--danger)" onclick="window.location.href='e5-reporte.html?orden=249'">⚠️</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Integración backend:
+// PATCH /api/ordenes/:id/estado → { estado: 'preparando'|'lista'|'entregada' }
+// POST /api/ordenes/:id/llamar → notifica al cliente (buzzer/pantalla)
+// Escuchar WS para actualizar en tiempo real
+
+let ultimosCambios = [];
+let timerDeshacer = null;
+
+function cambiarEstado(ordenId, nuevoEstado) {
+  // Guardar para deshacer
+  ultimosCambios.push({ ordenId, estadoAnterior: 'pendiente', nuevoEstado });
+
+  // TODO: fetch(`/api/ordenes/${ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado: nuevoEstado }) })
+  console.log(`Orden ${ordenId} → ${nuevoEstado}`);
+
+  // Mostrar toast
+  const toast = document.getElementById('toastMensaje');
+  toast.querySelector('span').textContent = `↩ Estado de Orden #${ordenId} cambiado a "${nuevoEstado}"`;
+  toast.style.display = 'flex';
+
+  // Timer deshacer
+  clearTimeout(timerDeshacer);
+  let countdown = 5;
+  const btn = document.getElementById('btnDeshacer');
+  btn.textContent = `Deshacer (${countdown}s)`;
+  const interval = setInterval(() => {
+    countdown--;
+    btn.textContent = `Deshacer (${countdown}s)`;
+    if (countdown <= 0) {
+      clearInterval(interval);
+      toast.style.display = 'none';
+      ultimosCambios = [];
+    }
+  }, 1000);
+}
+
+function llamarCliente(ordenId) {
+  // TODO: POST /api/ordenes/${ordenId}/llamar
+  console.log('Llamar cliente para orden:', ordenId);
+}
+
+document.getElementById('btnDeshacer').addEventListener('click', () => {
+  if (ultimosCambios.length > 0) {
+    const ultimo = ultimosCambios.pop();
+    // TODO: fetch(`/api/ordenes/${ultimo.ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado: ultimo.estadoAnterior }) })
+    console.log('Deshacer cambio:', ultimo);
+    document.getElementById('toastMensaje').style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>

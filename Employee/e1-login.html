@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empleado — E1 Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.hero{background:linear-gradient(160deg,var(--espresso),var(--roast));padding:40px 28px 32px;text-align:center;}
+.hero .em{font-size:52px;margin-bottom:12px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:24px;color:var(--cream);margin-bottom:4px;}
+.hero p{color:var(--warm);font-size:13px;}
+.body{padding:24px;}
+.section-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.role{padding:14px 8px;border:1.5px solid var(--warm);border-radius:14px;background:var(--mist);text-align:center;cursor:pointer;transition:all .15s;}
+.role.act{border-color:var(--caramel);background:#fdf4e3;}
+.role:hover{border-color:var(--caramel);}
+.role .ri{font-size:28px;margin-bottom:6px;}
+.role p{font-size:12px;font-weight:500;}
+.pin-label{text-align:center;font-size:13px;color:var(--latte);margin-bottom:12px;}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+.pd{width:16px;height:16px;border-radius:50%;background:var(--warm);transition:background .15s;}
+.pd.f{background:var(--espresso);}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.key{padding:14px;border:1.5px solid var(--warm);border-radius:12px;background:var(--mist);font-size:18px;font-weight:600;cursor:pointer;text-align:center;transition:background .15s;font-family:inherit;user-select:none;}
+.key:hover{background:var(--warm);}
+.key.del{font-size:14px;color:var(--danger);}
+.key.empty{border:none;background:transparent;cursor:default;}
+.error-msg{text-align:center;color:var(--danger);font-size:12px;font-weight:600;min-height:18px;margin-top:-10px;margin-bottom:8px;}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="hero">
+    <div class="em">👨‍🍳</div>
+    <h1>Acceso Empleado</h1>
+    <p>Selecciona tu rol e ingresa tu PIN</p>
+  </div>
+  <div class="body">
+    <p class="section-label">Selecciona tu rol</p>
+    <div class="roles" id="rolesContainer">
+      <div class="role act" data-rol="barista"><div class="ri">☕</div><p>Barista</p></div>
+      <div class="role" data-rol="mesero"><div class="ri">🍽️</div><p>Mesero</p></div>
+      <div class="role" data-rol="cocina"><div class="ri">🍳</div><p>Cocina</p></div>
+    </div>
+    <p class="pin-label">Ingresa tu PIN de 4 dígitos</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pd"></div><div class="pd"></div><div class="pd"></div><div class="pd"></div>
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="keypad" id="keypad">
+      <div class="key" data-val="1">1</div>
+      <div class="key" data-val="2">2</div>
+      <div class="key" data-val="3">3</div>
+      <div class="key" data-val="4">4</div>
+      <div class="key" data-val="5">5</div>
+      <div class="key" data-val="6">6</div>
+      <div class="key" data-val="7">7</div>
+      <div class="key" data-val="8">8</div>
+      <div class="key" data-val="9">9</div>
+      <div class="key empty"></div>
+      <div class="key" data-val="0">0</div>
+      <div class="key del" id="keyDel">⌫</div>
+    </div>
+  </div>
+</div>
+<script>
+// Integración backend:
+// POST /api/auth/empleado → { rol, pin } → { token, nombre, permisos } | { error }
+let pin = '';
+let rolSeleccionado = 'barista';
+
+document.querySelectorAll('.role').forEach(r => {
+  r.addEventListener('click', function() {
+    document.querySelectorAll('.role').forEach(x => x.classList.remove('act'));
+    this.classList.add('act');
+    rolSeleccionado = this.dataset.rol;
+    pin = '';
+    actualizarDots();
+    document.getElementById('errorMsg').textContent = '';
+  });
+});
+
+document.querySelectorAll('.key[data-val]').forEach(k => {
+  k.addEventListener('click', () => {
+    if (pin.length < 4) {
+      pin += k.dataset.val;
+      actualizarDots();
+      if (pin.length === 4) enviarLogin();
+    }
+  });
+});
+
+document.getElementById('keyDel').addEventListener('click', () => {
+  pin = pin.slice(0, -1);
+  actualizarDots();
+  document.getElementById('errorMsg').textContent = '';
+});
+
+function actualizarDots() {
+  document.querySelectorAll('.pd').forEach((d, i) => {
+    d.classList.toggle('f', i < pin.length);
+  });
+}
+
+function enviarLogin() {
+  // TODO: fetch('/api/auth/empleado', { method:'POST', body: JSON.stringify({ rol: rolSeleccionado, pin }) })
+  //   .then(r => r.json())
+  //   .then(data => { if(data.token) window.location.href='e2-cola.html'; else mostrarError(); })
+  console.log('Login:', { rol: rolSeleccionado, pin });
+  // Simulación: redirigir a cola
+  // window.location.href = 'e2-cola.html';
+  mostrarError(); // demo
+}
+
+function mostrarError() {
+  document.getElementById('errorMsg').textContent = 'PIN incorrecto. Intenta de nuevo.';
+  pin = '';
+  actualizarDots();
+}
+</script>
+</body>
+</html>

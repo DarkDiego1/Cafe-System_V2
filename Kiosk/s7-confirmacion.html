@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiosco — S7 Confirmación</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--espresso);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{width:100%;background:var(--espresso);min-height:100vh;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.confirm-check{margin-top:60px;width:100px;height:100px;background:var(--success);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:44px;color:#fff;animation:pop .4s cubic-bezier(.175,.885,.32,1.275);margin-bottom:24px;}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-num{font-family:'Playfair Display',serif;font-size:48px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.confirm-label{font-size:14px;color:var(--warm);margin-bottom:32px;}
+.confirm-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px 24px;margin:0 24px;text-align:left;width:calc(100% - 48px);}
+.confirm-card .row{display:flex;justify-content:space-between;font-size:14px;color:var(--warm);margin-bottom:10px;}
+.confirm-card .row span:last-child{color:var(--cream);font-weight:500;}
+.confirm-card .row.big{font-size:16px;border-top:1px solid rgba(255,255,255,.12);padding-top:10px;margin-top:4px;}
+.confirm-card .row.big span:last-child{color:var(--gold);font-weight:600;}
+.qr-block{margin:24px 24px 0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;width:calc(100% - 48px);}
+.qr-img{width:68px;height:68px;background:var(--cream);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.qr-info h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--cream);text-align:left;}
+.qr-info p{font-size:12px;color:var(--warm);margin-top:3px;text-align:left;}
+.confirm-actions{padding:24px;display:flex;gap:10px;width:100%;}
+.btn-ghost{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:var(--cream);border-radius:14px;padding:14px;font-size:14px;cursor:pointer;font-family:inherit;}
+.btn-ghost:hover{background:rgba(255,255,255,.15);}
+.btn-gold{flex:1;background:var(--gold);color:var(--espresso);border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-gold:hover{opacity:.9;}
+/* QR generado con CSS */
+.qr-pattern{display:grid;grid-template-columns:repeat(7,8px);gap:1px;padding:4px;background:var(--cream);}
+.qr-cell{width:8px;height:8px;background:#fff;}
+.qr-cell.dark{background:var(--espresso);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="confirm-check">✓</div>
+  <div class="confirm-num" id="ordenNumero">#247</div>
+  <div class="confirm-label">¡Tu orden está confirmada!</div>
+
+  <div class="confirm-card">
+    <div id="itemsOrden">
+      <div class="row"><span>Café Latte Clásico</span><span>$88</span></div>
+      <div class="row"><span>Frapé de Caramelo</span><span>$100</span></div>
+    </div>
+    <div class="row"><span>Propina (10%)</span><span id="propinaMonto">$19.80</span></div>
+    <div class="row big"><span>Total pagado</span><span id="totalPagado">$207.80</span></div>
+  </div>
+
+  <div class="qr-block">
+    <div class="qr-img">📱</div>
+    <div class="qr-info">
+      <h4 id="codigoOrden">Orden #247 — CNH-247</h4>
+      <p>Muestra este código al recoger tu pedido</p>
+      <p style="margin-top:4px;font-size:11px;color:#d4b88a">Tiempo estimado: ~8 min</p>
+    </div>
+  </div>
+
+  <!-- Puntos de lealtad ganados -->
+  <div style="margin:16px 24px 0;background:rgba(232,168,48,.12);border:1px solid rgba(232,168,48,.25);border-radius:14px;padding:14px 16px;width:calc(100% - 48px);text-align:left;">
+    <div style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:3px;">🏆 Puntos ganados</div>
+    <div style="font-size:13px;color:var(--warm);">+<strong id="puntosGanados" style="color:var(--gold)">21</strong> puntos añadidos a tu cuenta</div>
+  </div>
+
+  <div class="confirm-actions">
+    <button class="btn-ghost" onclick="nuevaOrden()">Nueva orden</button>
+    <button class="btn-gold" onclick="verEstado()">Ver estado →</button>
+  </div>
+</div>
+<script>
+// Integración backend:
+// La confirmación recibe datos de la orden vía URL params o sessionStorage
+// GET /api/ordenes/:id/confirmacion → { numero, codigo, items, total, propina, tiempoEstimado, puntosGanados }
+// El QR puede generarse con /api/qr/:codigo o una librería como qrcode.js
+
+const params = new URLSearchParams(window.location.search);
+const ordenId = params.get('orden') || '247';
+const codigo = `CNH-${ordenId}`;
+
+document.getElementById('ordenNumero').textContent = `#${ordenId}`;
+document.getElementById('codigoOrden').textContent = `Orden #${ordenId} — ${codigo}`;
+
+// TODO: fetch(`/api/ordenes/${ordenId}/confirmacion`).then(r=>r.json()).then(renderConfirmacion)
+
+// Limpiar carrito tras confirmación exitosa
+sessionStorage.removeItem('carrito');
+
+function nuevaOrden() {
+  sessionStorage.clear();
+  window.location.href = 's1-bienvenida.html';
+}
+
+function verEstado() {
+  window.location.href = `s8-espera.html?orden=${ordenId}`;
+}
+
+// Auto-redirigir a espera después de 8 segundos
+setTimeout(() => {
+  window.location.href = `s8-espera.html?orden=${ordenId}`;
+}, 8000);
+</script>
+</body>
+</html>

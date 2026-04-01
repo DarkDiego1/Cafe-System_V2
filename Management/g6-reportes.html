@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerente — G6 Reportes de Ventas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;--danger:#C0392B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
+.shell{background:var(--cream);width:100%;min-height:100vh;display:flex;flex-direction:column;flex:1;}
+.page-top{background:var(--espresso);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+.page-top h2{font-family:'Playfair Display',serif;color:var(--cream);font-size:22px;}
+.page-top p{color:var(--warm);font-size:12px;margin-top:2px;}
+.page-top .actions{display:flex;gap:8px;align-items:center;}
+.btn-p{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;}
+.btn-p:hover{background:var(--roast);}
+.btn-p.gold{background:var(--gold);color:var(--espresso);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px;}
+.kpi{background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px;}
+.kpi .kv{font-family:'Playfair Display',serif;font-size:26px;color:var(--espresso);margin-bottom:2px;}
+.kpi .kl{font-size:11px;color:var(--latte);}
+.kpi .kd{font-size:12px;margin-top:4px;font-weight:600;}
+.kpi .kd.up{color:var(--success);}
+.kpi .kd.neu{color:var(--caramel);}
+.section-label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:11px;color:var(--latte);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:8px 12px;background:var(--mist);text-align:left;}
+tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--warm);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--mist);}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="page-top">
+    <div><h2>Reportes de Ventas</h2><p>UC60–62 · RF24/RF62/RF64</p></div>
+    <div class="actions">
+      <input type="date" id="fechaDesde" value="2026-03-01" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
+      <input type="date" id="fechaHasta" value="2026-03-17" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
+      <button class="btn-p" id="btnAplicar" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25)">Aplicar</button>
+      <button class="btn-p gold" id="btnExportar">↓ Exportar</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kv" id="kpiVentas">$214,500</div><div class="kl">Ventas del período</div><div class="kd up">↑ +18% vs mes anterior</div></div>
+    <div class="kpi"><div class="kv" id="kpiOrdenes">2,145</div><div class="kl">Total órdenes</div><div class="kd up">↑ +234 órdenes</div></div>
+    <div class="kpi"><div class="kv" id="kpiTicket">$100</div><div class="kl">Ticket promedio</div><div class="kd neu">→ Sin cambio</div></div>
+    <div class="kpi"><div class="kv" id="kpiSatisfaccion">87%</div><div class="kl">Satisfacción</div><div class="kd up">↑ +2%</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 20px 24px">
+    <div>
+      <p class="section-label">Top bebidas del período</p>
+      <table id="tablaTopBebidas">
+        <thead><tr><th>#</th><th>Bebida</th><th>Unidades</th><th>Ingreso</th></tr></thead>
+        <tbody id="tbodyBebidas">
+          <tr><td>1</td><td>Cappuccino Clásico</td><td>480</td><td>$38,400</td></tr>
+          <tr><td>2</td><td>Cold Brew Original</td><td>340</td><td>$27,200</td></tr>
+          <tr><td>3</td><td>Frappé Caramelo</td><td>310</td><td>$29,450</td></tr>
+          <tr><td>4</td><td>Matcha Latte</td><td>280</td><td>$25,200</td></tr>
+          <tr><td>5</td><td>Americano Negro</td><td>265</td><td>$15,900</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <p class="section-label">Eficiencia por empleado</p>
+      <table id="tablaEmpleados">
+        <thead><tr><th>Empleado</th><th>Órdenes</th><th>Tiempo prom.</th><th>Rating</th></tr></thead>
+        <tbody id="tbodyEmpleados">
+          <tr><td>Ana López</td><td>842</td><td>6.8 min</td><td>⭐ 4.9</td></tr>
+          <tr><td>Pedro Ramírez</td><td>703</td><td>7.2 min</td><td>⭐ 4.7</td></tr>
+          <tr><td>Sofía Mendez</td><td>600</td><td>8.1 min</td><td>⭐ 4.6</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+// Integración backend:
+// GET /api/reportes?desde=&hasta= → { kpis:{ventas,ordenes,ticket,satisfaccion}, topBebidas:[...], eficienciaEmpleados:[...] }
+// GET /api/reportes/exportar?desde=&hasta=&formato=pdf|excel
+document.getElementById('btnAplicar').addEventListener('click', () => {
+  const desde = document.getElementById('fechaDesde').value;
+  const hasta = document.getElementById('fechaHasta').value;
+  // TODO: fetch(`/api/reportes?desde=${desde}&hasta=${hasta}`).then(r=>r.json()).then(renderReporte)
+  console.log('Cargar reporte:', { desde, hasta });
+});
+document.getElementById('btnExportar').addEventListener('click', () => {
+  const desde = document.getElementById('fechaDesde').value;
+  const hasta = document.getElementById('fechaHasta').value;
+  // TODO: GET /api/reportes/exportar?desde=...&hasta=...&formato=excel
+  console.log('Exportar reporte:', { desde, hasta });
+});
+</script>
+</body>
+</html>
