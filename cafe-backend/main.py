@@ -1,8 +1,20 @@
+"""
+main.py — Café Nuevos Horizontes API
+Versión actualizada con Módulo 03 completo.
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import database
+
+# Módulo 01 — Experiencia del Cliente
 from routers import drinks, ingredients, categories, orders
+
+# Módulo 03 — Gestión y Administración (MAM)
+from routers import inventory, suppliers, reports, admin
+from middleware.audit_middleware import AuditMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -10,13 +22,13 @@ async def lifespan(app: FastAPI):
     yield
     await database.disconnect()
 
+
 app = FastAPI(
     title="Café Nuevos Horizontes API",
-    version="1.0.0",
-    lifespan=lifespan
+    version="2.0.0",
+    lifespan=lifespan,
 )
 
-# CORS — permite que Vue (puerto 5173) hable con FastAPI (puerto 8000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -25,11 +37,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(drinks.router,      prefix="/api/drinks",      tags=["Bebidas"])
-app.include_router(ingredients.router, prefix="/api/ingredients",  tags=["Ingredientes"])
-app.include_router(categories.router,  prefix="/api/categories",   tags=["Categorías"])
-app.include_router(orders.router,      prefix="/api/orders",       tags=["Órdenes"])
+# ── Auditoría automática (CU65) ────────────────────────────────────────────
+app.add_middleware(AuditMiddleware)
+
+# ── Módulo 01 ──────────────────────────────────────────────────────────────
+app.include_router(drinks.router,      prefix="/api/drinks",       tags=["M01 · Bebidas"])
+app.include_router(ingredients.router, prefix="/api/ingredients",  tags=["M01 · Ingredientes"])
+app.include_router(categories.router,  prefix="/api/categories",   tags=["M01 · Categorías"])
+app.include_router(orders.router,      prefix="/api/orders",       tags=["M01 · Órdenes"])
+
+# ── Módulo 03 — Gestión y Administración ──────────────────────────────────
+app.include_router(inventory.router,   prefix="/api/inventory",    tags=["M03 · Inventario"])
+app.include_router(suppliers.router,   prefix="/api/suppliers",    tags=["M03 · Proveedores"])
+app.include_router(reports.router,     prefix="/api/reports",      tags=["M03 · Reportes"])
+app.include_router(admin.router,       prefix="/api/admin",        tags=["M03 · Administración"])
+
 
 @app.get("/")
 async def root():
-    return {"message": "API Café Nuevos Horizontes funcionando ✅"}
+    return {"message": "API Café Nuevos Horizontes v2.0 ✅"}
