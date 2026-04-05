@@ -10,6 +10,7 @@ import database
 
 # Módulo 01 — Experiencia del Cliente
 from routers import drinks, ingredients, categories, orders
+from routers import customer
 
 # Módulo 02 — Empleados y Producción
 from routers import production
@@ -49,6 +50,7 @@ app.include_router(drinks.router,      prefix="/api/drinks",       tags=["M01 ·
 app.include_router(ingredients.router, prefix="/api/ingredients",  tags=["M01 · Ingredientes"])
 app.include_router(categories.router,  prefix="/api/categories",   tags=["M01 · Categorías"])
 app.include_router(orders.router,      prefix="/api/orders",       tags=["M01 · Órdenes"])
+app.include_router(customer.router, prefix="/api/customer", tags=["M01 · Cliente"])
 
 # ── Módulo 02 — Producción y Operaciones ─────────────────────────────────
 app.include_router(production.router, prefix="/api/production", tags=["M02 · Producción"])
