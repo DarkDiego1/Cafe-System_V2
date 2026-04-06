@@ -17,6 +17,7 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .btn-p:hover{background:var(--roast);}
 .btn-p.gold{background:var(--gold);color:var(--espresso);}
 .input{width:100%;border:1.5px solid var(--warm);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;background:var(--mist);outline:none;color:var(--espresso);}
+.select{width:100%;border:1.5px solid var(--warm);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;background:var(--mist);outline:none;color:var(--espresso);appearance:none;}
 .badge{display:inline-block;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;}
 .b-ok{background:#e8f5eb;color:var(--success);}
 .b-gray{background:var(--mist);color:var(--latte);}
@@ -38,6 +39,16 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .tg .tk{width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;right:3px;top:3px;transition:all .2s;}
 .tg.off{background:var(--warm);}
 .tg.off .tk{right:auto;left:3px;}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--foam);border-radius:16px;padding:24px;width:380px;max-width:95vw;}
+.modal h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:11px;color:var(--latte);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.modal-footer{display:flex;gap:8px;margin-top:16px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:200;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -50,102 +61,245 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="split">
     <div class="left-p">
       <input class="input" id="buscarEmp" placeholder="🔍 Buscar empleado…" style="margin-bottom:12px">
-
-      <div class="emp-card act" data-id="1" onclick="seleccionarEmp(1)">
-        <div class="emp-av">☕</div>
-        <div class="emp-det"><div class="emp-name">Ana López</div><div class="emp-role">Barista · Turno mañana ✓</div></div>
-        <span class="badge b-ok">Activo</span>
-      </div>
-      <div class="emp-card" data-id="2" onclick="seleccionarEmp(2)">
-        <div class="emp-av">🍳</div>
-        <div class="emp-det"><div class="emp-name">Pedro Ramírez</div><div class="emp-role">Cocina · Turno mañana ✓</div></div>
-        <span class="badge b-ok">Activo</span>
-      </div>
-      <div class="emp-card" data-id="3" onclick="seleccionarEmp(3)">
-        <div class="emp-av">🍽️</div>
-        <div class="emp-det"><div class="emp-name">Sofía Mendez</div><div class="emp-role">Mesera · Turno tarde</div></div>
-        <span class="badge b-gray">Fuera turno</span>
-      </div>
-      <div class="emp-card" data-id="4" onclick="seleccionarEmp(4)">
-        <div class="emp-av">☕</div>
-        <div class="emp-det"><div class="emp-name">Jorge Torres</div><div class="emp-role">Barista · Turno tarde</div></div>
-        <span class="badge b-gray">Fuera turno</span>
+      <div id="listaEmpleados">
+        <p style="color:var(--latte);font-size:13px;padding:20px 0">Cargando empleados…</p>
       </div>
     </div>
 
     <div class="right-p">
-      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:16px" id="permTitulo">Ana López — Permisos</p>
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:16px" id="permTitulo">Selecciona un empleado</p>
 
-      <div class="perm-item">
-        <div><p>Ver cola de órdenes</p><small>Módulo Empleado</small></div>
-        <div class="tg" data-perm="ver_cola" onclick="togglePerm(this)"><div class="tk"></div></div>
+      <div id="panelPermisos" style="opacity:.4;pointer-events:none">
+        <div style="margin-bottom:12px">
+          <label style="font-size:11px;color:var(--latte);font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:4px">Rol</label>
+          <select class="select" id="selectRol">
+            <option value="empleado">Empleado</option>
+            <option value="barista">Barista</option>
+            <option value="gerente">Gerente</option>
+          </select>
+        </div>
+
+        <p style="font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--latte);margin-bottom:10px">Permisos del rol</p>
+        <div id="listaPermisos" style="font-size:12px;color:var(--latte);padding:8px 0">
+          Selecciona un empleado para ver sus permisos
+        </div>
+
+        <div style="height:14px"></div>
+        <button class="btn-p" id="btnGuardarPermisos" style="width:100%">Guardar rol</button>
       </div>
-      <div class="perm-item">
-        <div><p>Cambiar estado de orden</p><small>Módulo Empleado</small></div>
-        <div class="tg" data-perm="cambiar_estado" onclick="togglePerm(this)"><div class="tk"></div></div>
-      </div>
-      <div class="perm-item">
-        <div><p>Reportar problemas</p><small>Módulo Empleado</small></div>
-        <div class="tg" data-perm="reportar" onclick="togglePerm(this)"><div class="tk"></div></div>
-      </div>
-      <div class="perm-item">
-        <div><p>Ver inventario</p><small>Solo lectura</small></div>
-        <div class="tg off" data-perm="ver_inventario" onclick="togglePerm(this)"><div class="tk"></div></div>
-      </div>
-      <div class="perm-item">
-        <div><p>Editar menú</p><small>Requiere rol gerente</small></div>
-        <div class="tg off" data-perm="editar_menu" onclick="togglePerm(this)"><div class="tk"></div></div>
-      </div>
-      <div class="perm-item">
-        <div><p>Ver reportes</p><small>Requiere rol gerente</small></div>
-        <div class="tg off" data-perm="ver_reportes" onclick="togglePerm(this)"><div class="tk"></div></div>
-      </div>
-      <div style="height:14px"></div>
-      <button class="btn-p" id="btnGuardarPermisos" style="width:100%">Guardar permisos</button>
     </div>
   </div>
 </div>
+
+<!-- Modal nuevo empleado -->
+<div class="modal-overlay" id="modalEmp">
+  <div class="modal">
+    <h3>Nuevo empleado</h3>
+    <div class="field"><label>Nombre completo</label><input class="input" id="empNombre" placeholder="Nombre y apellido"></div>
+    <div class="field"><label>Usuario (login)</label><input class="input" id="empUsuario" placeholder="usuario_unico"></div>
+    <div class="field"><label>Contraseña</label><input class="input" type="password" id="empPassword" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field"><label>Rol</label>
+      <select class="select" id="empRol">
+        <option value="empleado">Empleado</option>
+        <option value="barista">Barista</option>
+        <option value="gerente">Gerente</option>
+      </select>
+    </div>
+    <div class="field"><label>Email</label><input class="input" id="empEmail" placeholder="correo@ejemplo.com"></div>
+    <div class="modal-footer">
+      <button class="btn-p" id="btnGuardarEmp" style="flex:1">Crear empleado</button>
+      <button class="btn-p" id="btnCancelarEmp" style="background:var(--warm);color:var(--espresso);flex:1">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-// Integración backend:
-// GET /api/empleados → [{ id, nombre, rol, turno, activo }]
-// GET /api/empleados/:id/permisos → { ver_cola, cambiar_estado, reportar, ver_inventario, editar_menu, ver_reportes }
-// PUT /api/empleados/:id/permisos → guardar permisos
-// POST /api/empleados → nuevo empleado
-let empSeleccionado = 1;
+const API = 'http://localhost:8000/api';
+let empSeleccionado = null;
+const rolesIconos = { gerente:'👔', barista:'☕', empleado:'🍽️' };
 
-function seleccionarEmp(id) {
-  empSeleccionado = id;
-  document.querySelectorAll('.emp-card').forEach(c => c.classList.remove('act'));
-  document.querySelector(`.emp-card[data-id="${id}"]`).classList.add('act');
-  // TODO: fetch(`/api/empleados/${id}/permisos`).then(r=>r.json()).then(renderPermisos)
-  console.log('Cargar permisos de empleado:', id);
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function togglePerm(el) {
-  el.classList.toggle('off');
+// ── Cargar empleados ──────────────────────────────────────
+
+async function cargarEmpleados() {
+  try {
+    const r = await fetch(`${API}/admin/employees`);
+    if (!r.ok) throw new Error(r.statusText);
+    const empleados = await r.json();
+    renderEmpleados(empleados);
+  } catch(err) {
+    document.getElementById('listaEmpleados').innerHTML =
+      `<p style="color:var(--danger);font-size:13px">Error: ${err.message}</p>`;
+  }
 }
 
-document.getElementById('btnGuardarPermisos').addEventListener('click', () => {
-  const permisos = {};
-  document.querySelectorAll('[data-perm]').forEach(tg => {
-    permisos[tg.dataset.perm] = !tg.classList.contains('off');
-  });
-  // TODO: fetch(`/api/empleados/${empSeleccionado}/permisos`, { method:'PUT', body: JSON.stringify(permisos) })
-  console.log('Guardar permisos:', { empleadoId: empSeleccionado, permisos });
+function renderEmpleados(empleados) {
+  const q = document.getElementById('buscarEmp').value.toLowerCase();
+  const filtrados = empleados.filter(e =>
+    !q || e.nombre_completo.toLowerCase().includes(q)
+  );
+
+  if (!filtrados.length) {
+    document.getElementById('listaEmpleados').innerHTML =
+      '<p style="color:var(--latte);font-size:13px;padding:20px 0">Sin empleados encontrados</p>';
+    return;
+  }
+
+  document.getElementById('listaEmpleados').innerHTML = filtrados.map(e => {
+    const icono = rolesIconos[e.rol] || '👤';
+    const badge = e.activo
+      ? '<span class="badge b-ok">Activo</span>'
+      : '<span class="badge b-gray">Inactivo</span>';
+    const activo = empSeleccionado?.id === e.id ? 'act' : '';
+    return `<div class="emp-card ${activo}" data-id="${e.id}" onclick="seleccionarEmp(${e.id})">
+      <div class="emp-av">${icono}</div>
+      <div class="emp-det">
+        <div class="emp-name">${e.nombre_completo}</div>
+        <div class="emp-role">${e.rol} · ${e.usuario || ''}</div>
+      </div>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+// ── Seleccionar empleado ──────────────────────────────────
+
+async function seleccionarEmp(id) {
+  try {
+    const r = await fetch(`${API}/admin/employees/${id}`);
+    if (!r.ok) throw new Error(r.statusText);
+    empSeleccionado = await r.json();
+
+    document.getElementById('permTitulo').textContent =
+      `${empSeleccionado.nombre_completo} — Rol y permisos`;
+    document.getElementById('selectRol').value = empSeleccionado.rol || 'empleado';
+
+    // Mostrar permisos del rol
+    const permisos = empSeleccionado.permisos || [];
+    document.getElementById('listaPermisos').innerHTML = permisos.length
+      ? permisos.map(p => `<div style="padding:4px 0">✓ ${p.replace(/_/g,' ')}</div>`).join('')
+      : '<div style="color:var(--latte)">Sin permisos asignados</div>';
+
+    // Habilitar panel
+    document.getElementById('panelPermisos').style.opacity = '1';
+    document.getElementById('panelPermisos').style.pointerEvents = 'auto';
+
+    // Resaltar card
+    document.querySelectorAll('.emp-card').forEach(c => c.classList.remove('act'));
+    document.querySelector(`.emp-card[data-id="${id}"]`)?.classList.add('act');
+  } catch(err) {
+    showToast('❌ Error al cargar empleado: ' + err.message);
+  }
+}
+
+// ── Guardar rol ───────────────────────────────────────────
+
+document.getElementById('btnGuardarPermisos').addEventListener('click', async () => {
+  if (!empSeleccionado) return;
+  const nuevoRol = document.getElementById('selectRol').value;
+
+  try {
+    const r = await fetch(`${API}/admin/employees/${empSeleccionado.id}/role`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({rol: nuevoRol}),
+    });
+    if (r.ok) {
+      const data = await r.json();
+      showToast(`✅ Rol actualizado a "${nuevoRol}"`);
+      // Refrescar permisos
+      const permisos = data.empleado?.permisos || [];
+      document.getElementById('listaPermisos').innerHTML = permisos.length
+        ? permisos.map(p => `<div style="padding:4px 0">✓ ${p.replace(/_/g,' ')}</div>`).join('')
+        : '<div>Sin permisos</div>';
+      cargarEmpleados();
+    } else {
+      const err = await r.json();
+      showToast('❌ ' + (err.detail || 'Error al guardar'));
+    }
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
 });
+
+// ── Nuevo empleado ────────────────────────────────────────
 
 document.getElementById('btnNuevoEmp').addEventListener('click', () => {
-  // TODO: abrir modal de nuevo empleado
-  console.log('Nuevo empleado');
+  document.getElementById('modalEmp').classList.add('open');
 });
 
-document.getElementById('buscarEmp').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase();
-  document.querySelectorAll('.emp-card').forEach(card => {
-    const nombre = card.querySelector('.emp-name').textContent.toLowerCase();
-    card.style.display = nombre.includes(q) ? '' : 'none';
-  });
+document.getElementById('btnCancelarEmp').addEventListener('click', () => {
+  document.getElementById('modalEmp').classList.remove('open');
 });
+
+document.getElementById('btnGuardarEmp').addEventListener('click', async () => {
+  const nombre   = document.getElementById('empNombre').value.trim();
+  const usuario  = document.getElementById('empUsuario').value.trim();
+  const password = document.getElementById('empPassword').value;
+  const rol      = document.getElementById('empRol').value;
+  const email    = document.getElementById('empEmail').value.trim();
+
+  if (!nombre || !usuario || password.length < 6) {
+    showToast('⚠ Nombre, usuario y contraseña (mín. 6 chars) son obligatorios');
+    return;
+  }
+
+  try {
+    // Hashear la contraseña en el cliente es opcional — aquí se envía al backend
+    // que la hashea internamente
+    const r = await fetch(`${API}/admin/employees`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nombre_completo: nombre,
+        usuario,
+        contrasena_hash: password, // el backend hashea
+        rol,
+        email: email || null,
+      }),
+    });
+    if (r.ok) {
+      showToast('✅ Empleado creado correctamente');
+      document.getElementById('modalEmp').classList.remove('open');
+      cargarEmpleados();
+    } else {
+      const err = await r.json();
+      showToast('❌ ' + (err.detail || 'Error al crear'));
+    }
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
+});
+
+// ── Búsqueda ──────────────────────────────────────────────
+
+let todosEmpleados = [];
+document.getElementById('buscarEmp').addEventListener('input', () => {
+  renderEmpleados(todosEmpleados);
+});
+
+// ── Init ──────────────────────────────────────────────────
+
+async function init() {
+  try {
+    const r = await fetch(`${API}/admin/employees`);
+    todosEmpleados = await r.json();
+    renderEmpleados(todosEmpleados);
+  } catch(err) {
+    document.getElementById('listaEmpleados').innerHTML =
+      `<p style="color:var(--danger);font-size:13px">Error al cargar: ${err.message}</p>`;
+  }
+}
+
+init();
 </script>
 </body>
 </html>

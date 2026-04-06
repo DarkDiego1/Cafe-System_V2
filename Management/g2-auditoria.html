@@ -29,6 +29,8 @@ tbody tr:hover{background:var(--mist);}
 .b-ok{background:#e8f5eb;color:var(--success);}
 .b-warn{background:#fdf4e3;color:var(--caramel);}
 .b-err{background:#fce8e6;color:var(--danger);}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -44,67 +46,169 @@ tbody tr:hover{background:var(--mist);}
   <div style="padding:20px">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
       <div class="field">
-        <label>Módulo</label>
-        <select class="select" id="filtroModulo">
-          <option value="">Todos los módulos</option>
-          <option value="Kiosco">Kiosco</option>
-          <option value="App Móvil">App Móvil</option>
-          <option value="Empleado">Empleado</option>
-          <option value="Gerente">Gerente</option>
+        <label>Tipo de evento</label>
+        <select class="select" id="filtroTipo">
+          <option value="">Todos los eventos</option>
+          <option value="crear_orden">Órdenes creadas</option>
+          <option value="cambiar_estado_orden">Cambios de estado</option>
+          <option value="modificar_menu">Cambios de menú</option>
+          <option value="crear_empleado">Empleados</option>
+          <option value="ajuste_stock_manual">Ajustes de inventario</option>
+          <option value="configurar_umbrales">Configuración</option>
+          <option value="login">Accesos</option>
         </select>
       </div>
       <div class="field">
-        <label>Usuario</label>
-        <input class="input" id="filtroUsuario" placeholder="Nombre o ID">
+        <label>Usuario (ID)</label>
+        <input class="input" id="filtroUsuario" placeholder="ID numérico del usuario">
       </div>
       <div class="field">
         <label>Desde</label>
-        <input class="input" type="date" id="filtroDesde" value="2026-03-17">
+        <input class="input" type="date" id="filtroDesde">
       </div>
       <div class="field">
         <label>Hasta</label>
-        <input class="input" type="date" id="filtroHasta" value="2026-03-17">
+        <input class="input" type="date" id="filtroHasta">
       </div>
     </div>
     <button class="btn-p" id="btnFiltrar" style="margin-bottom:16px">Filtrar</button>
+    <span id="totalRegistros" style="font-size:12px;color:var(--latte);margin-left:12px"></span>
 
     <table id="tablaAuditoria">
       <thead>
-        <tr><th>Fecha/Hora</th><th>Acción</th><th>Módulo</th><th>Usuario</th><th>IP</th><th>Resultado</th></tr>
+        <tr><th>Fecha/Hora</th><th>Evento</th><th>Descripción</th><th>Usuario</th><th>IP</th><th>Entidad</th></tr>
       </thead>
       <tbody id="tbodyAuditoria">
-        <tr><td>17 mar 10:34</td><td>Orden #251 creada</td><td>Kiosco</td><td>Sistema</td><td>10.0.1.5</td><td><span class="badge b-ok">Éxito</span></td></tr>
-        <tr><td>17 mar 10:32</td><td>Orden #247 entregada</td><td>Empleado</td><td>Ana López</td><td>Tablet-01</td><td><span class="badge b-ok">Éxito</span></td></tr>
-        <tr><td>17 mar 10:30</td><td>Precio Frappé $90→$95</td><td>Gerente</td><td>Carlos G.</td><td>Desktop-Mg</td><td><span class="badge b-ok">Éxito</span></td></tr>
-        <tr><td>17 mar 10:28</td><td>Alerta inventario avena</td><td>Sistema</td><td>Automático</td><td>—</td><td><span class="badge b-warn">Alerta</span></td></tr>
-        <tr><td>17 mar 10:25</td><td>Login fallido (PIN incorrecto)</td><td>Empleado</td><td>Desconocido</td><td>Tablet-02</td><td><span class="badge b-err">Error</span></td></tr>
-        <tr><td>17 mar 10:20</td><td>Pedro R. ingresó al turno</td><td>Empleado</td><td>Pedro R.</td><td>Tablet-02</td><td><span class="badge b-ok">Éxito</span></td></tr>
-        <tr><td>17 mar 10:15</td><td>Turno mañana iniciado</td><td>Gerente</td><td>Carlos G.</td><td>Desktop-Mg</td><td><span class="badge b-ok">Éxito</span></td></tr>
-        <tr><td>17 mar 10:10</td><td>Respaldo automático</td><td>Sistema</td><td>Automático</td><td>—</td><td><span class="badge b-ok">Éxito</span></td></tr>
+        <tr><td colspan="6" style="text-align:center;color:var(--latte);padding:20px">Cargando registros…</td></tr>
       </tbody>
     </table>
   </div>
 </div>
+<div class="toast" id="toast"></div>
+
 <script>
-// Integración backend:
-// GET /api/auditoria?modulo=&usuario=&desde=&hasta= → [{ fechaHora, accion, modulo, usuario, ip, resultado }]
-// GET /api/auditoria/exportar?formato=pdf|excel
+const API = 'http://localhost:8000/api';
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatFecha(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-MX', {day:'2-digit',month:'short'})
+    + ' ' + d.toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+}
+
+function badgeEvento(tipo) {
+  if (!tipo) return '<span class="badge b-warn">—</span>';
+  if (tipo.includes('crear') || tipo.includes('login')) return `<span class="badge b-ok">${tipo}</span>`;
+  if (tipo.includes('error') || tipo.includes('eliminar')) return `<span class="badge b-err">${tipo}</span>`;
+  return `<span class="badge b-warn">${tipo}</span>`;
+}
+
+async function cargarAuditoria(params = {}) {
+  const qs = new URLSearchParams();
+  if (params.tipo_evento) qs.set('tipo_evento', params.tipo_evento);
+  if (params.usuario_id)  qs.set('usuario_id', params.usuario_id);
+  if (params.fecha_inicio) qs.set('fecha_inicio', params.fecha_inicio + 'T00:00:00');
+  if (params.fecha_fin)    qs.set('fecha_fin',    params.fecha_fin   + 'T23:59:59');
+  qs.set('limit', '100');
+
+  try {
+    const r = await fetch(`${API}/admin/audit?${qs}`);
+    if (!r.ok) throw new Error(r.statusText);
+    const data = await r.json();
+    const registros = data.registros || [];
+
+    document.getElementById('totalRegistros').textContent =
+      `${data.total || registros.length} registros encontrados`;
+
+    const tbody = document.getElementById('tbodyAuditoria');
+    if (!registros.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--latte);padding:20px">Sin registros para los filtros seleccionados</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = registros.map(reg => `
+      <tr>
+        <td>${formatFecha(reg.fecha)}</td>
+        <td>${badgeEvento(reg.tipo_evento)}</td>
+        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+            title="${reg.descripcion || ''}">${reg.descripcion || '—'}</td>
+        <td>${reg.nombre_usuario || '—'}</td>
+        <td style="font-size:11px;color:var(--latte)">${reg.ip_origen || '—'}</td>
+        <td style="font-size:11px;color:var(--latte)">${reg.entidad_afectada || '—'}</td>
+      </tr>`).join('');
+  } catch(err) {
+    document.getElementById('tbodyAuditoria').innerHTML =
+      `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:20px">
+        Error al cargar: ${err.message}
+      </td></tr>`;
+  }
+}
+
+// Valores por defecto de fechas
+const hoy = new Date().toISOString().split('T')[0];
+const hace7dias = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
+document.getElementById('filtroDesde').value = hace7dias;
+document.getElementById('filtroHasta').value = hoy;
+
 document.getElementById('btnFiltrar').addEventListener('click', () => {
-  const params = {
-    modulo: document.getElementById('filtroModulo').value,
-    usuario: document.getElementById('filtroUsuario').value,
-    desde: document.getElementById('filtroDesde').value,
-    hasta: document.getElementById('filtroHasta').value
-  };
-  // TODO: fetch(`/api/auditoria?${new URLSearchParams(params)}`).then(r=>r.json()).then(renderTabla)
-  console.log('Filtrar auditoría:', params);
+  cargarAuditoria({
+    tipo_evento:   document.getElementById('filtroTipo').value,
+    usuario_id:    document.getElementById('filtroUsuario').value,
+    fecha_inicio:  document.getElementById('filtroDesde').value,
+    fecha_fin:     document.getElementById('filtroHasta').value,
+  });
 });
-document.getElementById('btnPDF').addEventListener('click', () => {
-  // TODO: GET /api/auditoria/exportar?formato=pdf
+
+document.getElementById('btnPDF').addEventListener('click', async () => {
+  showToast('📄 Exportando a PDF…');
+  // Exportar la tabla como texto plano (PDF real requiere librería adicional)
+  const filas = [...document.querySelectorAll('#tbodyAuditoria tr')];
+  const texto = filas.map(tr =>
+    [...tr.querySelectorAll('td')].map(td => td.textContent.trim()).join(' | ')
+  ).join('\n');
+  const blob = new Blob([texto], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `auditoria_${hoy}.txt`;
+  a.click();
+  showToast('✅ Exportado');
 });
-document.getElementById('btnExcel').addEventListener('click', () => {
-  // TODO: GET /api/auditoria/exportar?formato=excel
+
+document.getElementById('btnExcel').addEventListener('click', async () => {
+  showToast('📊 Exportando a CSV…');
+  const qs = new URLSearchParams({limit:'500'});
+  try {
+    const r = await fetch(`${API}/admin/audit?${qs}`);
+    const data = await r.json();
+    const registros = data.registros || [];
+    const csv = ['Fecha,Evento,Descripcion,Usuario,IP,Entidad',
+      ...registros.map(reg =>
+        [formatFecha(reg.fecha), reg.tipo_evento, reg.descripcion,
+         reg.nombre_usuario, reg.ip_origen, reg.entidad_afectada]
+        .map(v => `"${(v||'').replace(/"/g,'""')}"`)
+        .join(',')
+      )
+    ].join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `auditoria_${hoy}.csv`;
+    a.click();
+    showToast('✅ CSV descargado');
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
 });
+
+// Carga inicial
+cargarAuditoria({ fecha_inicio: hace7dias, fecha_fin: hoy });
 </script>
 </body>
 </html>

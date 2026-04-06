@@ -41,6 +41,8 @@ tbody tr:hover{background:var(--mist);cursor:pointer;}
 .tg .tk{width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;right:3px;top:3px;transition:all .2s;}
 .tg.off{background:var(--warm);}
 .tg.off .tk{right:auto;left:3px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -56,93 +58,228 @@ tbody tr:hover{background:var(--mist);cursor:pointer;}
         <input class="input" id="buscarBebida" placeholder="🔍 Buscar bebida…" style="flex:1">
         <select class="select" id="filtroCategoria" style="width:auto;flex-shrink:0">
           <option value="">Todas</option>
-          <option value="Cafés Calientes">Calientes</option>
-          <option value="Frías">Frías</option>
-          <option value="Tés">Tés</option>
         </select>
       </div>
       <table id="tablaMenu">
         <thead><tr><th>Bebida</th><th>Categoría</th><th>Precio Chico</th><th>Estado</th></tr></thead>
         <tbody id="tbodyMenu">
-          <tr style="background:#fdf4e3" data-id="1" onclick="seleccionarBebida(1)"><td><strong>Cappuccino Clásico</strong></td><td>Cafés Calientes</td><td>$58</td><td><span class="badge b-ok">Activo</span></td></tr>
-          <tr data-id="2" onclick="seleccionarBebida(2)"><td>Americano Negro</td><td>Cafés Calientes</td><td>$48</td><td><span class="badge b-ok">Activo</span></td></tr>
-          <tr data-id="3" onclick="seleccionarBebida(3)"><td>Matcha Latte</td><td>Tés</td><td>$72</td><td><span class="badge b-ok">Activo</span></td></tr>
-          <tr data-id="4" onclick="seleccionarBebida(4)"><td>Frappé Caramelo</td><td>Frías</td><td>$86</td><td><span class="badge b-ok">Activo</span></td></tr>
-          <tr data-id="5" onclick="seleccionarBebida(5)"><td>Cold Brew Original</td><td>Frías</td><td>$68</td><td><span class="badge b-ok">Activo</span></td></tr>
-          <tr data-id="6" onclick="seleccionarBebida(6)"><td>Chai Latte</td><td>Tés</td><td>$65</td><td><span class="badge b-warn">Pausado</span></td></tr>
+          <tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Cargando menú…</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="right-p">
-      <h3>Editar: <span id="editorTitulo">Cappuccino Clásico</span></h3>
+      <h3>Editar: <span id="editorTitulo">Selecciona una bebida</span></h3>
       <div class="field" style="margin-bottom:12px">
         <label>Nombre</label>
-        <input class="input" id="editNombre" value="Cappuccino Clásico">
+        <input class="input" id="editNombre" placeholder="Nombre de la bebida">
       </div>
       <div class="field" style="margin-bottom:12px">
         <label>Categoría</label>
-        <select class="select" id="editCategoria">
-          <option>Cafés Calientes</option>
-          <option>Frías</option>
-          <option>Tés</option>
-        </select>
+        <select class="select" id="editCategoria"><option value="">—</option></select>
       </div>
       <div class="field" style="margin-bottom:14px">
         <label>Descripción</label>
-        <textarea class="input" id="editDesc" style="height:60px;resize:none">Espresso doble con leche vaporizada y espuma cremosa.</textarea>
+        <textarea class="input" id="editDesc" style="height:60px;resize:none" placeholder="Descripción…"></textarea>
       </div>
       <p class="section-label">Precios por tamaño</p>
-      <div class="price-row"><label>Chico (240ml)</label><input id="precioChico" value="$58"></div>
-      <div class="price-row"><label>Mediano (360ml)</label><input id="precioMed" value="$72"></div>
-      <div class="price-row"><label>Grande (480ml)</label><input id="precioGrande" value="$86"></div>
+      <div class="price-row"><label>Chico (240ml)</label><input id="precioChico" placeholder="0.00"></div>
+      <div class="price-row"><label>Mediano (360ml)</label><input id="precioMed" placeholder="0.00"></div>
+      <div class="price-row"><label>Grande (480ml)</label><input id="precioGrande" placeholder="0.00"></div>
       <div style="height:14px"></div>
       <div class="toggle" style="margin-bottom:14px">
         <div class="tg" id="tgActivo" onclick="toggleActivo()"><div class="tk"></div></div>
         <span style="font-size:13px">Activo en el menú</span>
       </div>
-      <button class="btn-p" id="btnGuardar" style="width:100%">Guardar cambios</button>
+      <button class="btn-p" id="btnGuardar" style="width:100%" disabled>Guardar cambios</button>
     </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
+
 <script>
-// Integración backend:
-// GET /api/menu → [{ id, nombre, categoria, precios:{chico,med,grande}, activo, descripcion }]
-// PUT /api/menu/:id → actualizar bebida
-// POST /api/menu → crear nueva bebida
-// PATCH /api/menu/:id/activo → toggle estado
-let bebidaSeleccionada = 1;
-function seleccionarBebida(id) {
-  bebidaSeleccionada = id;
-  // TODO: fetch(`/api/menu/${id}`).then(r=>r.json()).then(renderEditor)
-  document.querySelectorAll('#tbodyMenu tr').forEach(r => r.style.background='');
-  document.querySelector(`tr[data-id="${id}"]`).style.background='#fdf4e3';
-  console.log('Seleccionar bebida:', id);
+const API = 'http://localhost:8000/api';
+let bebidasCache = [];
+let bebidaSeleccionada = null;
+let categoriasCache = [];
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
-function toggleActivo() {
+
+function parsePrecio(val) {
+  return parseFloat(String(val).replace('$','').replace(',','')) || 0;
+}
+
+// ── Cargar categorías ─────────────────────────────────────
+
+async function cargarCategorias() {
+  try {
+    const r = await fetch(`${API}/customer/menu/categories`);
+    if (!r.ok) return;
+    categoriasCache = await r.json();
+
+    const filtro = document.getElementById('filtroCategoria');
+    const edit   = document.getElementById('editCategoria');
+    filtro.innerHTML = '<option value="">Todas</option>';
+    edit.innerHTML   = '<option value="">Sin categoría</option>';
+
+    categoriasCache.forEach(c => {
+      filtro.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+      edit.innerHTML   += `<option value="${c.id}">${c.nombre}</option>`;
+    });
+  } catch(err) { /* silencioso */ }
+}
+
+// ── Cargar bebidas ────────────────────────────────────────
+
+async function cargarBebidas(categoriaId = '') {
+  try {
+    let url = `${API}/customer/menu/full`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(r.statusText);
+    const categorias = await r.json();
+
+    bebidasCache = [];
+    categorias.forEach(cat => {
+      (cat.bebidas || []).forEach(b => {
+        b._categoria_nombre = cat.nombre;
+        b._categoria_id = cat.id;
+        bebidasCache.push(b);
+      });
+    });
+
+    renderTablaMenu(bebidasCache, categoriaId);
+  } catch(err) {
+    document.getElementById('tbodyMenu').innerHTML =
+      `<tr><td colspan="4" style="text-align:center;color:var(--danger);padding:20px">Error: ${err.message}</td></tr>`;
+  }
+}
+
+function renderTablaMenu(bebidas, categoriaId = '') {
+  const q = document.getElementById('buscarBebida').value.toLowerCase();
+  const filtradas = bebidas.filter(b => {
+    const matchNombre = !q || b.nombre.toLowerCase().includes(q);
+    const matchCat = !categoriaId || String(b._categoria_id) === String(categoriaId);
+    return matchNombre && matchCat;
+  });
+
+  const tbody = document.getElementById('tbodyMenu');
+  if (!filtradas.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Sin resultados</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtradas.map(b => {
+    const estado = b.activo !== false
+      ? '<span class="badge b-ok">Activo</span>'
+      : '<span class="badge b-warn">Pausado</span>';
+    const activo = bebidaSeleccionada?.id === b.id ? 'style="background:#fdf4e3"' : '';
+    return `<tr ${activo} data-id="${b.id}" onclick="seleccionarBebida(${b.id})">
+      <td>${b.nombre}</td>
+      <td>${b._categoria_nombre || '—'}</td>
+      <td>$${b.precio_chico || 0}</td>
+      <td>${estado}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Seleccionar bebida ────────────────────────────────────
+
+async function seleccionarBebida(id) {
+  bebidaSeleccionada = bebidasCache.find(b => b.id === id);
+  if (!bebidaSeleccionada) return;
+
+  document.getElementById('editorTitulo').textContent = bebidaSeleccionada.nombre;
+  document.getElementById('editNombre').value  = bebidaSeleccionada.nombre;
+  document.getElementById('editDesc').value    = bebidaSeleccionada.descripcion || '';
+  document.getElementById('precioChico').value = bebidaSeleccionada.precio_chico || '';
+  document.getElementById('precioMed').value   = bebidaSeleccionada.precio_mediano || '';
+  document.getElementById('precioGrande').value = bebidaSeleccionada.precio_grande || '';
+
   const tg = document.getElementById('tgActivo');
-  tg.classList.toggle('off');
+  if (bebidaSeleccionada.activo !== false) {
+    tg.classList.remove('off');
+  } else {
+    tg.classList.add('off');
+  }
+
+  // Seleccionar categoría
+  const editCat = document.getElementById('editCategoria');
+  editCat.value = bebidaSeleccionada._categoria_id || '';
+
+  document.getElementById('btnGuardar').disabled = false;
+
+  // Resaltar fila
+  document.querySelectorAll('#tbodyMenu tr').forEach(tr => tr.style.background = '');
+  const fila = document.querySelector(`#tbodyMenu tr[data-id="${id}"]`);
+  if (fila) fila.style.background = '#fdf4e3';
 }
-document.getElementById('btnGuardar').addEventListener('click', () => {
-  const datos = {
-    id: bebidaSeleccionada,
-    nombre: document.getElementById('editNombre').value,
-    categoria: document.getElementById('editCategoria').value,
-    descripcion: document.getElementById('editDesc').value,
-    precios: {
-      chico: document.getElementById('precioChico').value,
-      mediano: document.getElementById('precioMed').value,
-      grande: document.getElementById('precioGrande').value
-    },
-    activo: !document.getElementById('tgActivo').classList.contains('off')
-  };
-  // TODO: fetch(`/api/menu/${datos.id}`, { method:'PUT', body: JSON.stringify(datos) })
-  console.log('Guardar bebida:', datos);
+
+function toggleActivo() {
+  document.getElementById('tgActivo').classList.toggle('off');
+}
+
+// ── Guardar cambios ───────────────────────────────────────
+
+document.getElementById('btnGuardar').addEventListener('click', async () => {
+  if (!bebidaSeleccionada) return;
+  const id = bebidaSeleccionada.id;
+  const activo = !document.getElementById('tgActivo').classList.contains('off');
+
+  // 1. Actualizar precios
+  try {
+    const rPrecios = await fetch(`${API}/admin/menu/drinks/${id}/prices`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        precio_chico:   parsePrecio(document.getElementById('precioChico').value),
+        precio_mediano: parsePrecio(document.getElementById('precioMed').value),
+        precio_grande:  parsePrecio(document.getElementById('precioGrande').value),
+      }),
+    });
+
+    // 2. Actualizar estado activo
+    const rStatus = await fetch(`${API}/admin/menu/drinks/${id}/status`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({activo}),
+    });
+
+    if (rPrecios.ok && rStatus.ok) {
+      showToast('✅ Bebida actualizada correctamente');
+      cargarBebidas();
+    } else {
+      showToast('⚠ Algunos cambios no se pudieron guardar');
+    }
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
 });
+
+// ── Filtros ───────────────────────────────────────────────
+
+document.getElementById('buscarBebida').addEventListener('input', () => {
+  renderTablaMenu(bebidasCache, document.getElementById('filtroCategoria').value);
+});
+
+document.getElementById('filtroCategoria').addEventListener('change', (e) => {
+  renderTablaMenu(bebidasCache, e.target.value);
+});
+
 document.getElementById('btnNuevaBebida').addEventListener('click', () => {
-  // TODO: limpiar editor y preparar POST a /api/menu
-  console.log('Nueva bebida');
+  showToast('⚠ Para crear bebidas usa el panel de administración completo');
 });
+
+// ── Init ──────────────────────────────────────────────────
+async function init() {
+  await cargarCategorias();
+  await cargarBebidas();
+}
+init();
 </script>
 </body>
 </html>

@@ -44,72 +44,62 @@ tbody tr:hover{background:var(--mist);}
 .ab-txt.err{color:var(--danger);}
 .ab-sub{font-size:12px;color:var(--roast);margin-top:2px;}
 .bar-chart{display:flex;align-items:flex-end;gap:8px;height:90px;padding:0 4px;}
-.bc-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--caramel),var(--gold));}
+.bc-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--caramel),var(--gold));transition:height .4s ease;}
 .bc-lbl{font-size:9px;color:var(--latte);text-align:center;margin-top:4px;}
 .live-bar{background:linear-gradient(90deg,var(--espresso),var(--roast));padding:10px 24px;display:flex;align-items:center;gap:14px;}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#6bffa0;flex-shrink:0;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .live-bar span{font-size:12px;color:var(--warm);}
 .live-bar strong{color:var(--cream);font-size:13px;}
+.hidden{display:none;}
 </style>
 </head>
 <body>
 <div class="shell">
   <div class="page-top">
-    <div><h2>Dashboard</h2><p>Martes 17 mar 2026 · Turno mañana</p></div>
+    <div><h2>Dashboard</h2><p id="fechaHoy">Cargando…</p></div>
     <div class="actions">
       <button class="btn-ghost" id="btnExportar">↓ Exportar</button>
       <button class="btn-p gold" id="btnReportes">Ver reportes</button>
     </div>
   </div>
 
-  <div class="alert-box err">
-    <div class="ab-ico">⚠️</div>
-    <div>
-      <div class="ab-txt err">Leche de avena al 12% de stock</div>
-      <div class="ab-sub">Umbral crítico: 15%. Generar orden de compra automática.</div>
-    </div>
-    <button class="btn-p" id="btnOrdenar" style="margin-left:auto;flex-shrink:0;font-size:11px">Ordenar ahora</button>
-  </div>
+  <!-- Alertas de inventario crítico -->
+  <div id="contenedorAlertas"></div>
 
   <div class="live-bar">
     <div class="live-dot"></div>
     <span>En tiempo real:</span>
-    <strong id="ordenesActivas">8 órdenes activas</strong>
+    <strong id="ordenesActivas">— órdenes activas</strong>
     <span>·</span>
-    <strong id="baristasActivos">3 baristas</strong>
-    <span>·</span>
-    <strong id="tiempoProm">Tiempo prom: 7 min</strong>
+    <strong id="tiempoProm">— min prom</strong>
   </div>
 
   <div class="kpi-grid" style="padding-bottom:0">
-    <div class="kpi"><div class="kv" id="kpiVentas">$14,280</div><div class="kl">Ventas hoy</div><div class="kd up">↑ +12% vs ayer</div></div>
-    <div class="kpi"><div class="kv" id="kpiOrdenes">142</div><div class="kl">Órdenes hoy</div><div class="kd up">↑ +8 vs ayer</div></div>
-    <div class="kpi"><div class="kv" id="kpiTicket">$100</div><div class="kl">Ticket promedio</div><div class="kd neu">→ Sin cambio</div></div>
-    <div class="kpi"><div class="kv" id="kpiTiempo">7.2 min</div><div class="kl">Tiempo espera</div><div class="kd dn">↑ +0.5 min</div></div>
+    <div class="kpi"><div class="kv" id="kpiVentas">—</div><div class="kl">Ventas hoy</div><div class="kd neu" id="kpiVentasDelta">Cargando…</div></div>
+    <div class="kpi"><div class="kv" id="kpiOrdenes">—</div><div class="kl">Órdenes hoy</div><div class="kd up" id="kpiOrdenesDelta"></div></div>
+    <div class="kpi"><div class="kv" id="kpiTicket">—</div><div class="kl">Ticket promedio</div><div class="kd neu">Actualizado</div></div>
+    <div class="kpi"><div class="kv" id="kpiTiempo">—</div><div class="kl">Tiempo espera</div><div class="kd neu" id="kpiTiempoDelta"></div></div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px 20px">
     <div style="background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px">
       <p class="section-label" style="margin-bottom:10px">📊 Ventas por hora</p>
       <div class="bar-chart" id="barChart">
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:40%"></div><div class="bc-lbl">7am</div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:75%"></div><div class="bc-lbl">8am</div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:90%"></div><div class="bc-lbl">9am</div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:60%"></div><div class="bc-lbl">10am</div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:45%"></div><div class="bc-lbl">11am</div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:30%"></div><div class="bc-lbl">12pm</div></div>
+        <!-- se llena dinámicamente -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1"><div class="bc-bar" style="height:40%"></div><div class="bc-lbl">—</div></div>
       </div>
     </div>
     <div style="background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:16px">
       <p class="section-label" style="margin-bottom:12px">🥧 Canales de venta</p>
       <div style="display:flex;flex-direction:column;gap:8px" id="canalesVenta">
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">Kiosco</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:52%;height:8px;background:var(--caramel);border-radius:10px"></div></div><strong>52%</strong></div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">App Móvil</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:35%;height:8px;background:var(--success);border-radius:10px"></div></div><strong>35%</strong></div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="min-width:60px">Mostrador</span><div style="flex:1;background:var(--warm);border-radius:10px;height:8px"><div style="width:13%;height:8px;background:var(--latte);border-radius:10px"></div></div><strong>13%</strong></div>
+        <div style="font-size:12px;color:var(--latte)">Cargando canales…</div>
       </div>
       <div style="height:1px;background:var(--warm);margin:14px 0"></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--latte)">Órdenes a tiempo</span><strong style="color:var(--success)" id="kpiATiempo">87%</strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px">
+        <span style="color:var(--latte)">Órdenes a tiempo</span>
+        <strong style="color:var(--success)" id="kpiATiempo">—%</strong>
+      </div>
     </div>
   </div>
 
@@ -117,33 +107,237 @@ tbody tr:hover{background:var(--mist);}
     <p class="section-label">Actividad reciente</p>
     <table id="tablaActividad">
       <thead><tr><th>Hora</th><th>Evento</th><th>Usuario</th><th>Módulo</th></tr></thead>
-      <tbody>
-        <tr><td>10:34</td><td>Orden #251 recibida</td><td>Sistema</td><td><span class="badge b-gray">Kiosco</span></td></tr>
-        <tr><td>10:32</td><td>Orden #247 entregada</td><td>Ana López</td><td><span class="badge b-ok">Barista</span></td></tr>
-        <tr><td>10:30</td><td>Precio Frappé ajustado +$5</td><td>Carlos G.</td><td><span class="badge b-warn">Gerente</span></td></tr>
-        <tr><td>10:28</td><td>Leche avena: alerta crítica</td><td>Sistema</td><td><span class="badge b-err">Inventario</span></td></tr>
+      <tbody id="tbodyActividad">
+        <tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Cargando actividad…</td></tr>
       </tbody>
     </table>
   </div>
 </div>
+
 <script>
-// Puntos de integración con backend:
-// GET /api/dashboard/kpis → { ventas, ordenes, ticket, tiempoEspera }
-// GET /api/dashboard/actividad → [{ hora, evento, usuario, modulo }]
-// GET /api/dashboard/canales → [{ nombre, porcentaje }]
-// GET /api/inventario/alertas → alertas críticas
-// POST /api/inventario/ordenar → genera orden de compra
-document.getElementById('btnOrdenar').addEventListener('click', () => {
-  // TODO: POST /api/inventario/ordenar
-  alert('Orden de compra generada (conectar backend)');
-});
-document.getElementById('btnExportar').addEventListener('click', () => {
-  // TODO: GET /api/dashboard/exportar
-});
+const API = 'http://localhost:8000/api';
+
+// ── Utilidades ────────────────────────────────────────────
+
+function formatMoney(n) {
+  return '$' + Number(n).toLocaleString('es-MX', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+
+function badgeModulo(modulo) {
+  const map = {
+    'Kiosco':'b-gray','Barista':'b-ok','Gerente':'b-warn','Inventario':'b-err','Sistema':'b-gray'};
+  const cls = map[modulo] || 'b-gray';
+  return `<span class="badge ${cls}">${modulo}</span>`;
+}
+
+// ── Fecha actual ──────────────────────────────────────────
+
+function mostrarFecha() {
+  const d = new Date();
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  document.getElementById('fechaHoy').textContent =
+    `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()} · Dashboard`;
+}
+
+// ── KPIs del dashboard ────────────────────────────────────
+
+async function cargarKPIs() {
+  try {
+    const hoy = new Date().toISOString().split('T')[0];
+    const r = await fetch(`${API}/reports/sales?fecha_inicio=${hoy}T00:00:00&fecha_fin=${hoy}T23:59:59`);
+    if (!r.ok) return;
+    const data = await r.json();
+
+    document.getElementById('kpiVentas').textContent  = formatMoney(data.total_ventas || 0);
+    document.getElementById('kpiOrdenes').textContent = data.total_ordenes || 0;
+    document.getElementById('kpiTicket').textContent  = formatMoney(data.ticket_promedio || 0);
+
+    const efic = await fetch(`${API}/reports/orders/efficiency?fecha_inicio=${hoy}T00:00:00&fecha_fin=${hoy}T23:59:59`);
+    if (efic.ok) {
+      const e = await efic.json();
+      const tiempo = e.tiempo_promedio_min || 0;
+      document.getElementById('kpiTiempo').textContent = `${tiempo} min`;
+      document.getElementById('tiempoProm').textContent = `Tiempo prom: ${tiempo} min`;
+      document.getElementById('kpiATiempo').textContent = `${e.pct_a_tiempo || 0}%`;
+    }
+  } catch(err) {
+    console.warn('KPIs no disponibles:', err.message);
+  }
+}
+
+// ── Órdenes activas en producción ────────────────────────
+
+async function cargarOrdenesActivas() {
+  try {
+    const r = await fetch(`${API}/production/orders`);
+    if (!r.ok) return;
+    const ordenes = await r.json();
+    document.getElementById('ordenesActivas').textContent =
+      `${ordenes.length} órdenes activas`;
+  } catch(err) { /* silencioso */ }
+}
+
+// ── Alertas de inventario crítico ────────────────────────
+
+async function cargarAlertas() {
+  try {
+    const r = await fetch(`${API}/inventory/ingredients?alerta=true`);
+    if (!r.ok) return;
+    const alertas = await r.json();
+    const contenedor = document.getElementById('contenedorAlertas');
+    contenedor.innerHTML = '';
+
+    if (!alertas.length) return;
+
+    const nombres = alertas.slice(0,3).map(a => a.nombre).join(', ');
+    contenedor.innerHTML = `
+      <div class="alert-box err">
+        <div class="ab-ico">⚠️</div>
+        <div>
+          <div class="ab-txt err">${alertas.length} insumo(s) en nivel crítico</div>
+          <div class="ab-sub">${nombres}. Generar orden de compra automática.</div>
+        </div>
+        <button class="btn-p" id="btnOrdenar" style="margin-left:auto;flex-shrink:0;font-size:11px">Ordenar ahora</button>
+      </div>`;
+
+    document.getElementById('btnOrdenar').addEventListener('click', generarOrdenCompra);
+  } catch(err) { /* silencioso */ }
+}
+
+async function generarOrdenCompra() {
+  try {
+    const r = await fetch(`${API}/inventory/purchase-orders/suggested`);
+    if (r.ok) {
+      alert('✅ Lista de compras generada. Revisa la sección de Inventario.');
+    }
+  } catch(err) {
+    alert('Error al generar la orden: ' + err.message);
+  }
+}
+
+// ── Actividad reciente desde auditoría ───────────────────
+
+async function cargarActividad() {
+  try {
+    const r = await fetch(`${API}/admin/audit?limit=8`);
+    if (!r.ok) return;
+    const data = await r.json();
+    const registros = data.registros || [];
+
+    const tbody = document.getElementById('tbodyActividad');
+    if (!registros.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Sin actividad reciente</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = registros.map(reg => {
+      const hora = new Date(reg.fecha).toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+      const modulo = reg.entidad_afectada || 'Sistema';
+      const moduloLabel = modulo.includes('order') ? 'Barista'
+        : modulo.includes('ingredient') ? 'Inventario'
+        : modulo.includes('employee') ? 'Gerente'
+        : 'Sistema';
+      return `<tr>
+        <td>${hora}</td>
+        <td>${reg.descripcion}</td>
+        <td>${reg.nombre_usuario}</td>
+        <td>${badgeModulo(moduloLabel)}</td>
+      </tr>`;
+    }).join('');
+  } catch(err) {
+    console.warn('Actividad no disponible:', err.message);
+  }
+}
+
+// ── Canales de venta (datos estáticos por ahora) ─────────
+
+function renderCanales() {
+  // Los canales requieren datos específicos que dependen del negocio.
+  // Se muestran datos representativos hasta que el backend tenga ese endpoint.
+  document.getElementById('canalesVenta').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+      <span style="min-width:60px">Kiosco</span>
+      <div style="flex:1;background:var(--warm);border-radius:10px;height:8px">
+        <div style="width:52%;height:8px;background:var(--caramel);border-radius:10px"></div>
+      </div><strong>52%</strong>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+      <span style="min-width:60px">App Móvil</span>
+      <div style="flex:1;background:var(--warm);border-radius:10px;height:8px">
+        <div style="width:35%;height:8px;background:var(--success);border-radius:10px"></div>
+      </div><strong>35%</strong>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+      <span style="min-width:60px">Mostrador</span>
+      <div style="flex:1;background:var(--warm);border-radius:10px;height:8px">
+        <div style="width:13%;height:8px;background:var(--latte);border-radius:10px"></div>
+      </div><strong>13%</strong>
+    </div>`;
+}
+
+// ── Barra de ventas por hora ──────────────────────────────
+
+async function cargarVentasPorHora() {
+  // Intentar obtener las ventas del día actual
+  const hoy = new Date().toISOString().split('T')[0];
+  const horas = [7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+  // Datos visuales de referencia (el endpoint de ventas por hora
+  // requeriría un endpoint específico de histograma)
+  const alturas = [40,75,90,60,45,55,80,70,50,40,35,45,30,20];
+  const chart = document.getElementById('barChart');
+  chart.innerHTML = horas.map((h,i) => `
+    <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+      <div class="bc-bar" style="height:${alturas[i] || 10}%"></div>
+      <div class="bc-lbl">${h > 12 ? h-12+'pm' : h+'am'}</div>
+    </div>`).join('');
+}
+
+// ── Botones ───────────────────────────────────────────────
+
 document.getElementById('btnReportes').addEventListener('click', () => {
-  // TODO: navegar a g6-reportes.html
   window.location.href = 'g6-reportes.html';
 });
+
+document.getElementById('btnExportar').addEventListener('click', async () => {
+  const hoy = new Date().toISOString().split('T')[0];
+  const url = `${API}/reports/sales?fecha_inicio=${hoy}T00:00:00&fecha_fin=${hoy}T23:59:59`;
+  try {
+    const r = await fetch(url);
+    const data = await r.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `dashboard_${hoy}.json`;
+    a.click();
+  } catch(err) {
+    alert('Error al exportar: ' + err.message);
+  }
+});
+
+// ── Inicialización ────────────────────────────────────────
+
+async function init() {
+  mostrarFecha();
+  renderCanales();
+  await Promise.all([
+    cargarKPIs(),
+    cargarOrdenesActivas(),
+    cargarAlertas(),
+    cargarActividad(),
+    cargarVentasPorHora(),
+  ]);
+}
+
+init();
+
+// Refrescar datos en tiempo real cada 30 segundos
+setInterval(() => {
+  cargarKPIs();
+  cargarOrdenesActivas();
+  cargarAlertas();
+  cargarActividad();
+}, 30000);
 </script>
 </body>
 </html>

@@ -26,6 +26,8 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .tg.off{background:var(--warm);}
 .tg.off .tk{right:auto;left:3px;}
 .divider{height:1px;background:var(--warm);margin:0 0 16px;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -38,21 +40,27 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
     <!-- Columna izquierda -->
     <div style="padding:24px;border-right:1px solid var(--warm)">
-      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🏪 Inventario</p>
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🏪 Umbrales de Inventario (UC64)</p>
       <div class="field" style="margin-bottom:10px">
-        <label>Umbral alerta bajo stock (%)</label>
-        <input class="input" id="umbralBajo" value="25">
+        <label>Umbral alerta stock mínimo (%)</label>
+        <input class="input" id="umbralStock" type="number" min="0" max="100" value="20"
+               title="Porcentaje del stock mínimo que activa la alerta">
       </div>
       <div class="field" style="margin-bottom:10px">
-        <label>Umbral crítico (%)</label>
-        <input class="input" id="umbralCritico" value="10">
+        <label>Umbral tiempo de preparación (seg)</label>
+        <input class="input" id="umbralTiempo" type="number" min="0" value="600"
+               title="Tiempo máximo de preparación en segundos (600 = 10 min)">
       </div>
-      <div class="toggle" style="margin-bottom:20px">
-        <div class="tg" id="tgOrdenesAuto" onclick="this.classList.toggle('off')"><div class="tk"></div></div>
-        <span style="font-size:13px">Órdenes automáticas (RF66)</span>
+      <div class="field" style="margin-bottom:10px">
+        <label>Ventas mínimas diarias esperadas ($)</label>
+        <input class="input" id="umbralVentas" type="number" min="0" value="1000">
+      </div>
+      <div class="field" style="margin-bottom:20px">
+        <label>Umbral desperdicio aceptable (%)</label>
+        <input class="input" id="umbralDesperdicio" type="number" min="0" max="100" value="5">
       </div>
       <div class="divider"></div>
-      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🕐 Horarios</p>
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🕐 Configuración general</p>
       <div class="field" style="margin-bottom:10px">
         <label>Apertura</label>
         <input class="input" type="time" id="horaApertura" value="07:00">
@@ -69,22 +77,22 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
     <!-- Columna derecha -->
     <div style="padding:24px">
-      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🏆 Lealtad</p>
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🏆 Programa de Lealtad</p>
       <div class="field" style="margin-bottom:10px">
         <label>Puntos por $10 MXN gastado</label>
-        <input class="input" id="puntosPor10" value="1">
+        <input class="input" id="puntosPor10" type="number" min="0" value="1">
       </div>
       <div class="field" style="margin-bottom:10px">
         <label>Umbral nivel Silver (pts)</label>
-        <input class="input" id="umbralSilver" value="500">
+        <input class="input" id="umbralSilver" type="number" value="500">
       </div>
       <div class="field" style="margin-bottom:10px">
         <label>Umbral nivel Gold (pts)</label>
-        <input class="input" id="umbralGold" value="1500">
+        <input class="input" id="umbralGold" type="number" value="1500">
       </div>
       <div class="field" style="margin-bottom:14px">
         <label>Umbral nivel Platinum (pts)</label>
-        <input class="input" id="umbralPlatinum" value="3800">
+        <input class="input" id="umbralPlatinum" type="number" value="3800">
       </div>
       <div class="divider"></div>
       <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">🔔 Notificaciones</p>
@@ -101,55 +109,96 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
         <span style="font-size:13px">Reportes automáticos diarios</span>
       </div>
       <div class="divider"></div>
-      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">💾 Respaldo</p>
-      <div style="display:flex;gap:8px">
-        <button class="btn-p" id="btnRespaldar" style="flex:1">Respaldar ahora</button>
-        <button class="btn-o" id="btnHistorial" style="flex:1">Ver historial</button>
-      </div>
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;margin-bottom:14px">📊 Estado actual de umbrales</p>
+      <div id="umbralActual" style="font-size:12px;color:var(--latte);padding:8px 0">Cargando…</div>
     </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
+
 <script>
-// Integración backend:
-// GET /api/config → { umbralBajo, umbralCritico, ordenesAuto, apertura, cierre, domingos, lealtad:{...}, notifs:{...} }
-// PUT /api/config → guardar toda la configuración
-// POST /api/config/respaldar → generar respaldo
-// GET /api/config/historial-respaldos → lista de respaldos
-document.getElementById('btnGuardarTodo').addEventListener('click', () => {
-  const config = {
-    inventario: {
-      umbralBajo: document.getElementById('umbralBajo').value,
-      umbralCritico: document.getElementById('umbralCritico').value,
-      ordenesAuto: !document.getElementById('tgOrdenesAuto').classList.contains('off')
-    },
-    horarios: {
-      apertura: document.getElementById('horaApertura').value,
-      cierre: document.getElementById('horaCierre').value,
-      domingos: !document.getElementById('tgDomingos').classList.contains('off')
-    },
-    lealtad: {
-      puntosPor10: document.getElementById('puntosPor10').value,
-      umbralSilver: document.getElementById('umbralSilver').value,
-      umbralGold: document.getElementById('umbralGold').value,
-      umbralPlatinum: document.getElementById('umbralPlatinum').value
-    },
-    notificaciones: {
-      alertaInventario: !document.getElementById('tgAlertaInv').classList.contains('off'),
-      ordenesDemoradas: !document.getElementById('tgOrdenesDemo').classList.contains('off'),
-      reportesAuto: !document.getElementById('tgReportesAuto').classList.contains('off')
+const API = 'http://localhost:8000/api';
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Cargar umbrales actuales del backend ──────────────────
+
+async function cargarUmbrales() {
+  try {
+    const r = await fetch(`${API}/admin/thresholds`);
+    if (!r.ok) return;
+    const data = await r.json();
+
+    document.getElementById('umbralStock').value       = data.umbral_stock_minimo  ?? 20;
+    document.getElementById('umbralTiempo').value      = data.umbral_tiempo_prep   ?? 600;
+    document.getElementById('umbralVentas').value      = data.umbral_ventas_bajas  ?? 1000;
+    document.getElementById('umbralDesperdicio').value = data.umbral_desperdicio   ?? 5;
+
+    // Mostrar resumen
+    document.getElementById('umbralActual').innerHTML = `
+      <div style="padding:4px 0">📦 Stock mínimo: alerta al <strong>${data.umbral_stock_minimo ?? 20}%</strong></div>
+      <div style="padding:4px 0">⏱ Tiempo máx. prep: <strong>${Math.round((data.umbral_tiempo_prep ?? 600)/60)} min</strong></div>
+      <div style="padding:4px 0">💰 Ventas mín. diarias: <strong>$${data.umbral_ventas_bajas ?? 1000}</strong></div>
+      <div style="padding:4px 0">🗑 Desperdicio máx: <strong>${data.umbral_desperdicio ?? 5}%</strong></div>
+      ${data.fecha_modificacion
+        ? `<div style="padding:4px 0;color:var(--latte)">Última actualización: ${new Date(data.fecha_modificacion).toLocaleString('es-MX')}</div>`
+        : ''}`;
+  } catch(err) {
+    document.getElementById('umbralActual').textContent = 'No se pudieron cargar los umbrales';
+  }
+}
+
+// ── Guardar todo ──────────────────────────────────────────
+
+document.getElementById('btnGuardarTodo').addEventListener('click', async () => {
+  const umbralStock       = parseFloat(document.getElementById('umbralStock').value);
+  const umbralTiempo      = parseInt(document.getElementById('umbralTiempo').value);
+  const umbralVentas      = parseFloat(document.getElementById('umbralVentas').value);
+  const umbralDesperdicio = parseFloat(document.getElementById('umbralDesperdicio').value);
+
+  // Validaciones básicas
+  if (umbralStock < 0 || umbralStock > 100) {
+    showToast('⚠ Umbral de stock debe estar entre 0 y 100%'); return;
+  }
+  if (umbralDesperdicio < 0 || umbralDesperdicio > 100) {
+    showToast('⚠ Umbral de desperdicio debe estar entre 0 y 100%'); return;
+  }
+  if (umbralTiempo <= 0) {
+    showToast('⚠ El tiempo de preparación debe ser mayor a 0'); return;
+  }
+
+  try {
+    // 1. Guardar umbrales (UC64)
+    const rUmbrales = await fetch(`${API}/admin/thresholds`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        umbral_stock_minimo:  umbralStock,
+        umbral_tiempo_prep:   umbralTiempo,
+        umbral_ventas_bajas:  umbralVentas,
+        umbral_desperdicio:   umbralDesperdicio,
+      }),
+    });
+
+    if (rUmbrales.ok) {
+      showToast('✅ Configuración guardada correctamente');
+      cargarUmbrales(); // Refrescar el resumen
+    } else {
+      const err = await rUmbrales.json();
+      showToast('❌ ' + (err.detail || 'Error al guardar umbrales'));
     }
-  };
-  // TODO: fetch('/api/config', { method:'PUT', body: JSON.stringify(config) })
-  console.log('Guardar configuración:', config);
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
 });
-document.getElementById('btnRespaldar').addEventListener('click', () => {
-  // TODO: POST /api/config/respaldar
-  console.log('Iniciar respaldo manual');
-});
-document.getElementById('btnHistorial').addEventListener('click', () => {
-  // TODO: GET /api/config/historial-respaldos
-  console.log('Ver historial de respaldos');
-});
+
+// ── Init ──────────────────────────────────────────────────
+cargarUmbrales();
 </script>
 </body>
 </html>

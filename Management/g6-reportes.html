@@ -30,6 +30,8 @@ thead th{font-size:11px;color:var(--latte);text-transform:uppercase;letter-spaci
 tbody td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--warm);}
 tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover{background:var(--mist);}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -37,18 +39,18 @@ tbody tr:hover{background:var(--mist);}
   <div class="page-top">
     <div><h2>Reportes de Ventas</h2><p>UC60–62 · RF24/RF62/RF64</p></div>
     <div class="actions">
-      <input type="date" id="fechaDesde" value="2026-03-01" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
-      <input type="date" id="fechaHasta" value="2026-03-17" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
+      <input type="date" id="fechaDesde" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
+      <input type="date" id="fechaHasta" style="border:1px solid rgba(255,255,255,.25);background:transparent;color:var(--cream);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12px">
       <button class="btn-p" id="btnAplicar" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25)">Aplicar</button>
       <button class="btn-p gold" id="btnExportar">↓ Exportar</button>
     </div>
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi"><div class="kv" id="kpiVentas">$214,500</div><div class="kl">Ventas del período</div><div class="kd up">↑ +18% vs mes anterior</div></div>
-    <div class="kpi"><div class="kv" id="kpiOrdenes">2,145</div><div class="kl">Total órdenes</div><div class="kd up">↑ +234 órdenes</div></div>
-    <div class="kpi"><div class="kv" id="kpiTicket">$100</div><div class="kl">Ticket promedio</div><div class="kd neu">→ Sin cambio</div></div>
-    <div class="kpi"><div class="kv" id="kpiSatisfaccion">87%</div><div class="kl">Satisfacción</div><div class="kd up">↑ +2%</div></div>
+    <div class="kpi"><div class="kv" id="kpiVentas">—</div><div class="kl">Ventas del período</div><div class="kd up" id="kpiVentasDelta">Cargando…</div></div>
+    <div class="kpi"><div class="kv" id="kpiOrdenes">—</div><div class="kl">Total órdenes</div><div class="kd up" id="kpiOrdenesDelta"></div></div>
+    <div class="kpi"><div class="kv" id="kpiTicket">—</div><div class="kl">Ticket promedio</div><div class="kd neu">Período</div></div>
+    <div class="kpi"><div class="kv" id="kpiSatisfaccion">—%</div><div class="kl">Órdenes a tiempo</div><div class="kd up" id="kpiSatDelta"></div></div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 20px 24px">
@@ -57,43 +59,119 @@ tbody tr:hover{background:var(--mist);}
       <table id="tablaTopBebidas">
         <thead><tr><th>#</th><th>Bebida</th><th>Unidades</th><th>Ingreso</th></tr></thead>
         <tbody id="tbodyBebidas">
-          <tr><td>1</td><td>Cappuccino Clásico</td><td>480</td><td>$38,400</td></tr>
-          <tr><td>2</td><td>Cold Brew Original</td><td>340</td><td>$27,200</td></tr>
-          <tr><td>3</td><td>Frappé Caramelo</td><td>310</td><td>$29,450</td></tr>
-          <tr><td>4</td><td>Matcha Latte</td><td>280</td><td>$25,200</td></tr>
-          <tr><td>5</td><td>Americano Negro</td><td>265</td><td>$15,900</td></tr>
+          <tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Selecciona un período y aplica</td></tr>
         </tbody>
       </table>
     </div>
     <div>
       <p class="section-label">Eficiencia por empleado</p>
       <table id="tablaEmpleados">
-        <thead><tr><th>Empleado</th><th>Órdenes</th><th>Tiempo prom.</th><th>Rating</th></tr></thead>
+        <thead><tr><th>Empleado</th><th>Órdenes</th><th>Tiempo prom.</th><th>A tiempo</th></tr></thead>
         <tbody id="tbodyEmpleados">
-          <tr><td>Ana López</td><td>842</td><td>6.8 min</td><td>⭐ 4.9</td></tr>
-          <tr><td>Pedro Ramírez</td><td>703</td><td>7.2 min</td><td>⭐ 4.7</td></tr>
-          <tr><td>Sofía Mendez</td><td>600</td><td>8.1 min</td><td>⭐ 4.6</td></tr>
+          <tr><td colspan="4" style="text-align:center;color:var(--latte);padding:20px">Cargando…</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
+
 <script>
-// Integración backend:
-// GET /api/reportes?desde=&hasta= → { kpis:{ventas,ordenes,ticket,satisfaccion}, topBebidas:[...], eficienciaEmpleados:[...] }
-// GET /api/reportes/exportar?desde=&hasta=&formato=pdf|excel
-document.getElementById('btnAplicar').addEventListener('click', () => {
+const API = 'http://localhost:8000/api';
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function formatMoney(n) {
+  return '$' + Number(n||0).toLocaleString('es-MX', {minimumFractionDigits:0,maximumFractionDigits:0});
+}
+
+async function cargarReporte() {
   const desde = document.getElementById('fechaDesde').value;
   const hasta = document.getElementById('fechaHasta').value;
-  // TODO: fetch(`/api/reportes?desde=${desde}&hasta=${hasta}`).then(r=>r.json()).then(renderReporte)
-  console.log('Cargar reporte:', { desde, hasta });
-});
-document.getElementById('btnExportar').addEventListener('click', () => {
+  if (!desde || !hasta) { showToast('⚠ Selecciona un rango de fechas'); return; }
+
+  const fi = desde + 'T00:00:00';
+  const ff = hasta + 'T23:59:59';
+
+  try {
+    // KPIs de ventas
+    const rVentas = await fetch(`${API}/reports/sales?fecha_inicio=${fi}&fecha_fin=${ff}`);
+    if (rVentas.ok) {
+      const v = await rVentas.json();
+      document.getElementById('kpiVentas').textContent  = formatMoney(v.total_ventas);
+      document.getElementById('kpiOrdenes').textContent = v.total_ordenes || 0;
+      document.getElementById('kpiTicket').textContent  = formatMoney(v.ticket_promedio);
+    }
+
+    // Bebidas populares
+    const rBebidas = await fetch(`${API}/reports/drinks/popular?fecha_inicio=${fi}&fecha_fin=${ff}&top=5`);
+    if (rBebidas.ok) {
+      const bebidas = await rBebidas.json();
+      const lista = bebidas.bebidas_populares || bebidas || [];
+      document.getElementById('tbodyBebidas').innerHTML = lista.length
+        ? lista.map((b,i) => `<tr>
+            <td>${i+1}</td>
+            <td>${b.nombre}</td>
+            <td>${b.total_vendido || b.cantidad || 0}</td>
+            <td>${formatMoney(b.ingreso_total || b.ingresos || 0)}</td>
+          </tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:var(--latte);padding:16px">Sin datos</td></tr>';
+    }
+
+    // Eficiencia
+    const rEfic = await fetch(`${API}/reports/orders/efficiency?fecha_inicio=${fi}&fecha_fin=${ff}`);
+    if (rEfic.ok) {
+      const e = await rEfic.json();
+      document.getElementById('kpiSatisfaccion').textContent = `${e.pct_a_tiempo || 0}%`;
+
+      const empleados = e.por_empleado || [];
+      document.getElementById('tbodyEmpleados').innerHTML = empleados.length
+        ? empleados.map(emp => `<tr>
+            <td>${emp.empleado || emp.nombre || '—'}</td>
+            <td>${emp.total_ordenes || 0}</td>
+            <td>${emp.tiempo_promedio_min || 0} min</td>
+            <td>${emp.pct_a_tiempo || 0}%</td>
+          </tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:var(--latte);padding:16px">Sin datos de empleados</td></tr>';
+    }
+  } catch(err) {
+    showToast('❌ Error al cargar reportes: ' + err.message);
+  }
+}
+
+// Fechas por defecto: primer día del mes hasta hoy
+const hoy = new Date();
+const primerDia = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().split('T')[0];
+document.getElementById('fechaDesde').value = primerDia;
+document.getElementById('fechaHasta').value = hoy.toISOString().split('T')[0];
+
+document.getElementById('btnAplicar').addEventListener('click', cargarReporte);
+
+document.getElementById('btnExportar').addEventListener('click', async () => {
   const desde = document.getElementById('fechaDesde').value;
   const hasta = document.getElementById('fechaHasta').value;
-  // TODO: GET /api/reportes/exportar?desde=...&hasta=...&formato=excel
-  console.log('Exportar reporte:', { desde, hasta });
+  showToast('📊 Generando exportación…');
+  try {
+    const r = await fetch(`${API}/reports/sales?fecha_inicio=${desde}T00:00:00&fecha_fin=${hasta}T23:59:59`);
+    const data = await r.json();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `reporte_${desde}_${hasta}.json`;
+    a.click();
+    showToast('✅ Exportado');
+  } catch(err) {
+    showToast('❌ Error: ' + err.message);
+  }
 });
+
+// Cargar al iniciar
+cargarReporte();
 </script>
 </body>
 </html>
