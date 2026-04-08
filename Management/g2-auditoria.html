@@ -31,9 +31,52 @@ tbody tr:hover{background:var(--mist);}
 .b-err{background:#fce8e6;color:var(--danger);}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--espresso);color:var(--cream);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;}
 .toast.show{opacity:1;}
+
+/* ── Sidebar ── */
+:root{--sidebar:210px;}
+body{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar);flex-shrink:0;background:#2C1A0E;min-height:100vh;
+  display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;}
+.sidebar-brand{padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sidebar-brand h1{font-family:'Playfair Display',serif;color:#F5EDD8;font-size:16px;
+  font-weight:700;line-height:1.3;}
+.sidebar-brand p{color:#8B5E3C;font-size:9px;margin-top:3px;letter-spacing:.1em;text-transform:uppercase;}
+.nav-section{padding:14px 18px 4px;font-size:9px;color:#8B5E3C;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;
+  color:rgba(255,255,255,.55);font-size:12px;cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent;text-decoration:none;font-family:'DM Sans',sans-serif;}
+.nav-item:hover{color:#F5EDD8;background:rgba(255,255,255,.05);}
+.nav-item.active{color:#F5EDD8;background:rgba(232,168,48,.12);border-left-color:#E8A830;}
+.nav-item .ni{font-size:14px;width:16px;text-align:center;flex-shrink:0;}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:#8B5E3C;}
+.main-wrap{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;}
+.shell{flex:1;display:flex;flex-direction:column;}
+
 </style>
 </head>
 <body>
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h1>Café Nuevos<br>Horizontes</h1>
+    <p>Panel de Gerencia</p>
+  </div>
+  <nav style="flex:1;padding:8px 0;">
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item " href="g1-dashboard.html"><span class="ni">📊</span>Dashboard</a>
+    <a class="nav-item " href="g6-reportes.html"><span class="ni">📈</span>Reportes</a>
+    <div class="nav-section">Inventario</div>
+    <a class="nav-item " href="g3-inventario.html"><span class="ni">📦</span>Inventario</a>
+    <div class="nav-section">Menú y Personal</div>
+    <a class="nav-item " href="g4-menu.html"><span class="ni">☕</span>Gestión de Menú</a>
+    <a class="nav-item " href="g5-empleados.html"><span class="ni">👥</span>Empleados</a>
+    <div class="nav-section">Sistema</div>
+    <a class="nav-item active" href="g2-auditoria.html"><span class="ni">🔍</span>Auditoría</a>
+    <a class="nav-item " href="g7-configuracion.html"><span class="ni">⚙️</span>Configuración</a>
+  </nav>
+  <div class="sidebar-footer">Sistema Dominia v2.0</div>
+</aside>
+<div class="main-wrap">
 <div class="shell">
   <div class="page-top">
     <div><h2>Auditoría del Sistema</h2><p>Log de actividad · UC65</p></div>
@@ -210,5 +253,6 @@ document.getElementById('btnExcel').addEventListener('click', async () => {
 // Carga inicial
 cargarAuditoria({ fecha_inicio: hace7dias, fecha_fin: hoy });
 </script>
+</div><!-- /main-wrap -->
 </body>
 </html>

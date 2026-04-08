@@ -41,24 +41,32 @@ class AdminService:
         datos_nuevos: Optional[dict] = None,
         ip_origen: Optional[str] = None,
     ) -> None:
-        """
-        Persiste un evento de auditoría. Llamado automáticamente por cada
-        operación sensible del sistema.
-        Corresponde al flujo CU65 — registro automático de eventos.
-        """
         db = await database.get_db()
+        accion_map = {
+            "crear_ingrediente": "INSERT", "modificar_ingrediente": "UPDATE",
+            "eliminar_ingrediente": "DELETE", "ajuste_stock_manual": "UPDATE",
+            "entrada_mercancia": "UPDATE", "registrar_merma": "INSERT",
+            "crear_proveedor": "INSERT", "modificar_proveedor": "UPDATE",
+            "crear_empleado": "INSERT", "modificar_empleado": "UPDATE",
+            "cambiar_rol": "UPDATE", "modificar_menu": "UPDATE",
+            "configurar_umbrales": "UPDATE", "generar_reporte": "INSERT",
+            "crear_orden_compra": "INSERT", "cambiar_estado_orden": "UPDATE",
+            "login": "LOGIN", "logout": "LOGOUT",
+        }
+        accion  = accion_map.get(tipo_evento, "UPDATE")
+        entidad = entidad_afectada or tipo_evento
         await db.execute("""
             INSERT INTO audit_logs
                 (tipo_evento, descripcion, usuario_id, nombre_usuario,
                  entidad_afectada, entidad_id, datos_anteriores,
-                 datos_nuevos, ip_origen, fecha)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+                 datos_nuevos, ip_origen, fecha, entidad, accion)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), $10, $11)
         """,
             tipo_evento, descripcion, usuario_id, nombre_usuario,
             entidad_afectada, entidad_id,
             json.dumps(datos_anteriores) if datos_anteriores else None,
             json.dumps(datos_nuevos) if datos_nuevos else None,
-            ip_origen,
+            ip_origen, entidad, accion,
         )
 
     async def obtener_registros_auditoria(

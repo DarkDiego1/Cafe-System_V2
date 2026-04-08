@@ -26,8 +26,10 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .act-start:hover{background:#2d6236;}
 .act-ready{background:var(--gold);color:var(--espresso);}
 .act-ready:hover{opacity:.9;}
+.act-deliver{background:#3a7d44;color:#fff;}
 .act-issue{background:rgba(255,255,255,.1);color:var(--warm);border:1px solid rgba(255,255,255,.15);}
 .act-issue:hover{background:rgba(255,255,255,.2);}
+.act-btn:disabled{opacity:.4;cursor:not-allowed;}
 .right{padding:24px;background:var(--cream);}
 .right h3{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;}
 .recipe-item{background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:12px 14px;margin-bottom:8px;}
@@ -37,10 +39,12 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 .ri-mod{font-size:12px;color:var(--latte);}
 .ri-ings{display:flex;flex-wrap:wrap;gap:6px;}
 .ri-ing{background:var(--espresso);color:var(--cream);border-radius:10px;padding:3px 10px;font-size:11px;}
+.ri-ing.custom{background:var(--caramel);}
 .notes-box{background:#fdf4e3;border-left:3px solid var(--caramel);border-radius:12px;padding:12px 14px;margin-top:16px;}
 .notes-box .nl{font-size:11px;color:var(--caramel);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
 .notes-box p{font-size:13px;color:var(--roast);}
-.estado-badge{display:inline-block;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;margin-bottom:8px;}
+.estado-chip{display:inline-block;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;margin-bottom:12px;}
+.loading-text{color:var(--latte);font-size:13px;padding:20px 0;}
 </style>
 </head>
 <body>
@@ -48,88 +52,254 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="layout">
     <div class="left">
       <a class="back" href="e2-cola.html">← Cola</a>
-      <h2 id="ordenTitulo">Orden #251</h2>
-      <div class="sub" id="ordenSub">Kiosco · 10:30 am</div>
+      <h2 id="ordenTitulo">Cargando…</h2>
+      <div class="sub" id="ordenSub">—</div>
 
-      <div class="info-row"><span class="il">Canal</span><span class="iv" id="infoCanal">Kiosco</span></div>
-      <div class="info-row"><span class="il">Código recogida</span><span class="iv" id="infoCodigo" style="color:var(--gold)">CNH-251</span></div>
-      <div class="info-row"><span class="il">Tiempo espera</span><span class="iv" id="infoTiempo" style="color:#ffd97a">4:20 min ⚠️</span></div>
-      <div class="info-row"><span class="il">Total pagado</span><span class="iv" id="infoTotal">$194 MXN</span></div>
-      <div class="info-row"><span class="il">Pago</span><span class="iv" id="infoPago">✓ Tarjeta</span></div>
+      <div id="estadoChip"></div>
+      <div class="info-row"><span class="il">Código recogida</span><span class="iv" id="infoCodigo" style="color:var(--gold)">—</span></div>
+      <div class="info-row"><span class="il">Tiempo en cola</span><span class="iv" id="infoTiempo" style="color:#ffd97a">—</span></div>
+      <div class="info-row"><span class="il">Total pagado</span><span class="iv" id="infoTotal">—</span></div>
+      <div class="info-row"><span class="il">Estado</span><span class="iv" id="infoEstado">—</span></div>
 
       <div class="actions">
-        <button class="act-btn act-start" id="btnIniciar">▶ Iniciar preparación</button>
-        <button class="act-btn act-ready" id="btnLista">✅ Marcar como lista</button>
-        <button class="act-btn act-issue" id="btnProblema" onclick="window.location.href='e5-reporte.html?orden=251'">⚠️ Reportar problema</button>
+        <button class="act-btn act-start" id="btnIniciar" onclick="cambiarEstado('start')">▶ Iniciar preparación</button>
+        <button class="act-btn act-ready" id="btnLista" onclick="cambiarEstado('ready')">✅ Marcar como lista</button>
+        <button class="act-btn act-deliver" id="btnEntregada" onclick="cambiarEstado('deliver')" style="display:none">📦 Marcar como entregada</button>
+        <button class="act-btn act-issue" id="btnProblema">⚠️ Reportar problema</button>
       </div>
     </div>
 
     <div class="right">
       <h3>Receta completa</h3>
-
-      <div class="recipe-item" id="receta1">
-        <div class="ri-top">
-          <span class="ri-em">☕</span>
-          <span class="ri-name">Americano Negro</span>
-          <span class="ri-mod">×2 · Chico</span>
-        </div>
-        <div class="ri-ings">
-          <span class="ri-ing">2 shots espresso</span>
-          <span class="ri-ing">120ml agua caliente</span>
-          <span class="ri-ing">Sin azúcar</span>
-        </div>
-      </div>
-
-      <div class="recipe-item" id="receta2">
-        <div class="ri-top">
-          <span class="ri-em">🧋</span>
-          <span class="ri-name">Frappé Caramelo</span>
-          <span class="ri-mod">×1 · Grande</span>
-        </div>
-        <div class="ri-ings">
-          <span class="ri-ing">2 shots espresso</span>
-          <span class="ri-ing">200ml leche entera</span>
-          <span class="ri-ing">150g hielo</span>
-          <span class="ri-ing">30ml sirope caramelo</span>
-          <span class="ri-ing">Crema chantilly</span>
-        </div>
-      </div>
-
-      <div class="notes-box">
-        <div class="nl">⚠️ Nota del cliente</div>
-        <p id="notasCliente">Un americano sin azúcar, el otro con una pizca. El frappé extra dulce por favor.</p>
-      </div>
+      <div id="recetasContainer"><p class="loading-text">Cargando recetas…</p></div>
+      <div id="notasContainer"></div>
     </div>
   </div>
 </div>
+
 <script>
-// Integración backend:
-// GET /api/ordenes/:id → { id, canal, codigo, tiempoEspera, total, pago, items:[...], notas }
-// PATCH /api/ordenes/:id/estado → { estado: 'preparando'|'lista'|'entregada' }
-
-// Leer orden de URL params
+const API = 'http://localhost:8000/api';
 const params = new URLSearchParams(window.location.search);
-const ordenId = params.get('orden') || '251';
-document.getElementById('ordenTitulo').textContent = `Orden #${ordenId}`;
-document.getElementById('infoCodigo').textContent = `CNH-${ordenId}`;
-// TODO: fetch(`/api/ordenes/${ordenId}`).then(r=>r.json()).then(renderDetalle)
+const ordenId = params.get('orden');
+let estadoActual = '';
 
-let estadoActual = 'pendiente'; // pendiente | preparando | lista | entregada
+if (!ordenId) window.location.href = 'e2-cola.html';
 
-document.getElementById('btnIniciar').addEventListener('click', () => {
-  // TODO: fetch(`/api/ordenes/${ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado:'preparando' }) })
-  estadoActual = 'preparando';
-  document.getElementById('btnIniciar').style.opacity = '0.5';
-  document.getElementById('btnIniciar').disabled = true;
-  console.log('Iniciar preparación orden:', ordenId);
-});
+// ── Cargar orden ──────────────────────────────────────────
 
-document.getElementById('btnLista').addEventListener('click', () => {
-  // TODO: fetch(`/api/ordenes/${ordenId}/estado`, { method:'PATCH', body: JSON.stringify({ estado:'lista' }) })
-  estadoActual = 'lista';
-  console.log('Marcar lista orden:', ordenId);
-  window.location.href = 'e2-cola.html';
-});
+async function cargarOrden() {
+  try {
+    const r = await fetch(`${API}/production/orders/${ordenId}`);
+    if (!r.ok) throw new Error('Orden no encontrada');
+    const orden = await r.json();
+    renderOrden(orden);
+    await cargarRecetas();
+  } catch(err) {
+    document.getElementById('ordenTitulo').textContent = 'Error';
+    document.getElementById('ordenSub').textContent = err.message;
+  }
+}
+
+function renderOrden(o) {
+  const codigo = o.codigo_orden || ordenId.slice(0,8).toUpperCase();
+  document.getElementById('ordenTitulo').textContent = `Orden #${codigo}`;
+
+  const fecha = o.fecha_creacion ? new Date(o.fecha_creacion) : new Date();
+  document.getElementById('ordenSub').textContent =
+    `${o.nombre_cliente || 'Cliente'} · ${fecha.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}`;
+
+  document.getElementById('infoCodigo').textContent = codigo;
+  document.getElementById('infoTotal').textContent  = `$${Number(o.total||0).toFixed(0)} MXN`;
+
+  // Tiempo en cola
+  const mins = Math.floor((Date.now() - fecha.getTime()) / 60000);
+  const secs = Math.floor(((Date.now() - fecha.getTime()) % 60000) / 1000);
+  const tiempoStr = `${mins}:${secs.toString().padStart(2,'0')} min`;
+  const tiempoEl = document.getElementById('infoTiempo');
+  tiempoEl.textContent = tiempoStr;
+  if (mins >= 10) { tiempoEl.style.color = '#ff7a7a'; tiempoEl.textContent += ' 🔴'; }
+  else if (mins >= 6) { tiempoEl.style.color = '#ffd97a'; tiempoEl.textContent += ' ⚠️'; }
+
+  estadoActual = o.estado || 'pendiente';
+  document.getElementById('infoEstado').textContent = o.estado || '—';
+  actualizarBotones(o.estado);
+}
+
+function actualizarBotones(estado) {
+  const e = (estado || '').toLowerCase().replace('preparacion','_preparacion').replace('para','_para');
+  const btnI = document.getElementById('btnIniciar');
+  const btnL = document.getElementById('btnLista');
+  const btnD = document.getElementById('btnEntregada');
+
+  // Pendiente/Pagado → puede iniciar
+  const esPendiente = ['pendiente','pagado','Pendiente','Pagado'].includes(estado);
+  const esPrep      = ['en_preparacion','EnPreparacion'].includes(estado);
+  const esLista     = ['lista','ListaParaRecoger'].includes(estado);
+
+  btnI.disabled = !esPendiente;
+  btnI.style.opacity = esPendiente ? '1' : '0.4';
+  btnL.disabled = !esPrep;
+  btnL.style.opacity = esPrep ? '1' : '0.4';
+  btnD.style.display = esLista ? 'block' : 'none';
+
+  document.getElementById('btnProblema').onclick = () => {
+    window.location.href = `e5-reporte.html?orden=${ordenId}`;
+  };
+}
+
+// ── Cambiar estado ────────────────────────────────────────
+
+async function cambiarEstado(accion) {
+  // accion: 'start' | 'ready' | 'deliver'
+  const endpoints = {
+    start:   `/production/orders/${ordenId}/start`,
+    ready:   `/production/orders/${ordenId}/ready`,
+    deliver: `/production/orders/${ordenId}/deliver`,
+  };
+
+  const sesion = JSON.parse(sessionStorage.getItem('empleado') || '{}');
+  const body = accion === 'start'
+    ? JSON.stringify({ empleado_id: sesion.id || null })
+    : '{}';
+
+  try {
+    const r = await fetch(`${API}${endpoints[accion]}`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body,
+    });
+    if (!r.ok) {
+      const err = await r.json();
+      alert('Error: ' + (err.detail || r.statusText));
+      return;
+    }
+    const data = await r.json();
+
+    if (accion === 'ready') {
+      // También notificar al cliente (CU43)
+      await fetch(`${API}/production/orders/${ordenId}/notify`, { method: 'POST' });
+      // Registrar tiempo (CU47)
+      await fetch(`${API}/production/orders/${ordenId}/prep-time`, { method: 'POST' });
+    }
+
+    if (accion === 'deliver') {
+      window.location.href = 'e2-cola.html';
+      return;
+    }
+
+    // Refrescar estado
+    estadoActual = data.estado || estadoActual;
+    document.getElementById('infoEstado').textContent = data.estado || estadoActual;
+    actualizarBotones(data.estado || estadoActual);
+
+  } catch(err) {
+    alert('Error de conexión: ' + err.message);
+  }
+}
+
+// ── Cargar recetas ────────────────────────────────────────
+
+async function cargarRecetas() {
+  try {
+    const r = await fetch(`${API}/production/orders/${ordenId}/recipes`);
+    if (!r.ok) {
+      // Fallback: usar detalle de la orden
+      await cargarRecetasDesdOrden();
+      return;
+    }
+    const recetas = await r.json();
+    renderRecetas(recetas);
+  } catch(err) {
+    await cargarRecetasDesdOrden();
+  }
+}
+
+async function cargarRecetasDesdOrden() {
+  try {
+    const r = await fetch(`${API}/production/orders/${ordenId}`);
+    if (!r.ok) return;
+    const orden = await r.json();
+    // Mostrar items sin receta detallada
+    const items = orden.items || [];
+    renderRecetasSimples(items);
+
+    // Mostrar notas si hay
+    if (orden.notas_generales) {
+      document.getElementById('notasContainer').innerHTML = `
+        <div class="notes-box">
+          <div class="nl">⚠️ Nota del cliente</div>
+          <p>${orden.notas_generales}</p>
+        </div>`;
+    }
+  } catch(err) {
+    document.getElementById('recetasContainer').innerHTML =
+      '<p class="loading-text">No se pudieron cargar las recetas</p>';
+  }
+}
+
+function renderRecetas(recetas) {
+  if (!recetas || !recetas.length) {
+    document.getElementById('recetasContainer').innerHTML =
+      '<p class="loading-text">Sin recetas disponibles</p>';
+    return;
+  }
+
+  document.getElementById('recetasContainer').innerHTML = recetas.map(r => {
+    const ings = (r.ingredientes || []).map(i => {
+      const custom = i.personalizado ? 'custom' : '';
+      return `<span class="ri-ing ${custom}">${i.cantidad || ''} ${i.unidad || ''} ${i.nombre}</span>`;
+    }).join('');
+
+    return `<div class="recipe-item">
+      <div class="ri-top">
+        <span class="ri-em">☕</span>
+        <span class="ri-name">${r.nombre_bebida || r.nombre}</span>
+        <span class="ri-mod">${r.tamano ? '· '+r.tamano : ''} ${r.cantidad > 1 ? '×'+r.cantidad : ''}</span>
+      </div>
+      <div class="ri-ings">${ings || '<span style="color:var(--latte);font-size:11px">Sin ingredientes registrados</span>'}</div>
+      ${r.notas ? `<div style="font-size:11px;color:var(--caramel);margin-top:6px">⚠ ${r.notas}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderRecetasSimples(items) {
+  if (!items.length) {
+    document.getElementById('recetasContainer').innerHTML =
+      '<p class="loading-text">Sin ítems en esta orden</p>';
+    return;
+  }
+  document.getElementById('recetasContainer').innerHTML = items.map(i => `
+    <div class="recipe-item">
+      <div class="ri-top">
+        <span class="ri-em">☕</span>
+        <span class="ri-name">${i.nombre_bebida || i.bebida || 'Bebida'}</span>
+        <span class="ri-mod">· ${i.tamano || ''} ${i.cantidad > 1 ? '×'+i.cantidad : ''}</span>
+      </div>
+      ${i.notas_item ? `<div style="font-size:11px;color:var(--caramel);margin-top:6px">⚠ ${i.notas_item}</div>` : ''}
+    </div>`).join('');
+}
+
+// ── Cargar notas (CU40) ───────────────────────────────────
+
+async function cargarNotas() {
+  try {
+    const r = await fetch(`${API}/production/orders/${ordenId}/notes`);
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data.tiene_notas && data.notas_generales) {
+      document.getElementById('notasContainer').innerHTML = `
+        <div class="notes-box">
+          <div class="nl">⚠️ Nota del cliente</div>
+          <p>${data.notas_generales}</p>
+        </div>`;
+    }
+  } catch(err) {}
+}
+
+// ── Init ──────────────────────────────────────────────────
+
+cargarOrden();
+cargarNotas();
 </script>
 </body>
 </html>
