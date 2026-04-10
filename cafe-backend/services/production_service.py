@@ -5,9 +5,13 @@ Módulo 02 — Producción y Operaciones (POM)
 Servicio: ProductionService
 Casos de uso: CU36, CU37, CU38, CU42, CU44, CU45, CU46, CU47
 
-Orquesta el ciclo de vida de las órdenes desde que llegan
-a producción hasta que se entregan al cliente.
-Comparte la tabla `orders` con M01 — solo lee/escribe columnas propias.
+CORRECCIÓN: _actualizar_estado_db convierte estado dominio → valor real BD
+  dominio       → BD
+  en_preparacion → EnPreparacion
+  lista          → ListaParaRecoger
+  entregada      → Entregada
+  cancelada      → Cancelada
+  con_problema   → Cancelada
 """
 
 from datetime import datetime
@@ -18,17 +22,19 @@ from entities.order import Order, OrderItem, ESTADOS_VALIDOS
 
 
 class ProductionService:
-    """
-    Servicio de producción que gestiona el flujo completo de una orden
-    desde su recepción hasta su entrega.
 
-    Lee la tabla `orders` (creada por M01) y actualiza:
-      - estado
-      - empleado_asignado_id
-      - tiempo_preparacion_seg
-      - entregada_a_tiempo
-      - fecha_inicio_prep, fecha_lista, fecha_entrega
-    """
+    # ── Conversión de estados ─────────────────────────────────────────
+
+    ESTADO_A_DB = {
+        "pendiente":      "Pendiente",
+        "pagado":         "Pagado",
+        "en_preparacion": "EnPreparacion",
+        "lista":          "ListaParaRecoger",
+        "entregada":      "Entregada",
+        "cancelada":      "Cancelada",
+        "rechazada":      "Rechazada",
+        "con_problema":   "Cancelada",
+    }
 
     # ── Helpers internos ──────────────────────────────────────────────
 
@@ -88,16 +94,22 @@ class ProductionService:
         orden: Order,
         campos_extra: Optional[dict] = None,
     ) -> None:
-        """Persiste el estado y campos extra de la orden."""
+        """
+        Persiste el estado y campos extra de la orden.
+        Convierte el estado del dominio al valor real del CHECK constraint de la BD.
+        """
+        # Convertir estado dominio → valor real del CHECK constraint
+        estado_db = self.ESTADO_A_DB.get(orden.estado, orden.estado)
+
         campos = {
-            "estado": orden.estado,
-            "empleado_asignado_id": orden.empleado_asignado_id,
+            "estado":                 estado_db,
+            "empleado_asignado_id":   orden.empleado_asignado_id,
             "tiempo_preparacion_seg": orden.tiempo_preparacion_seg,
-            "entregada_a_tiempo": orden.entregada_a_tiempo,
-            "fecha_inicio_prep": orden.fecha_inicio_prep,
-            "fecha_lista": orden.fecha_lista,
-            "fecha_entrega": orden.fecha_entrega,
-            "reporte_problema": orden.reporte_problema,
+            "entregada_a_tiempo":     orden.entregada_a_tiempo,
+            "fecha_inicio_prep":      orden.fecha_inicio_prep,
+            "fecha_lista":            orden.fecha_lista,
+            "fecha_entrega":          orden.fecha_entrega,
+            "reporte_problema":       orden.reporte_problema,
         }
         if campos_extra:
             campos.update(campos_extra)
@@ -106,7 +118,8 @@ class ProductionService:
             f"{k} = ${i+2}" for i, k in enumerate(campos)
         )
         await db.execute(
-            f"UPDATE orders SET {set_clauses} WHERE id = $1::uuid",
+            f"UPDATE orders SET {set_clauses}, fecha_actualizacion = NOW() "
+            f"WHERE id = $1::uuid",
             orden.id, *list(campos.values()),
         )
 
@@ -116,7 +129,7 @@ class ProductionService:
 
     async def recibir_orden_produccion(self, orden_id: str) -> Order:
         """
-        Retorna la orden recién llegada a producción con fecha estimada.
+        Retorna la orden recién llegada a producción.
         Corresponde a Enviar_orden_produccion() → Enviar_fecha_estimada() — CU36.
         """
         db = await database.get_db()
@@ -128,18 +141,21 @@ class ProductionService:
         empleado_id: Optional[int] = None,
     ) -> list[dict]:
         """
-        Lista las órdenes activas en producción, filtradas por estado
-        o por barista asignado. CU36.
+        Lista las órdenes activas en producción. CU36.
+        Excluye las terminales usando los valores reales del CHECK.
         """
         db = await database.get_db()
 
-        condiciones = ["o.estado NOT IN ('cancelada', 'entregada')"]
+        # Valores reales del CHECK constraint — excluir terminales
+        condiciones = ["o.estado NOT IN ('Cancelada', 'Entregada', 'Rechazada')"]
         params: list = []
         p = 1
 
         if estado:
+            # Convertir si viene en formato dominio
+            estado_db = self.ESTADO_A_DB.get(estado, estado)
             condiciones.append(f"o.estado = ${p}")
-            params.append(estado)
+            params.append(estado_db)
             p += 1
         if empleado_id:
             condiciones.append(f"o.empleado_asignado_id = ${p}")
@@ -165,17 +181,31 @@ class ProductionService:
             ORDER BY o.fecha_creacion ASC
         """, *params)
 
-        return [dict(r) for r in rows]
+        # Enriquecer con items para el frontend
+        resultado = []
+        for r in rows:
+            d = dict(r)
+            # Cargar items de la orden
+            items_rows = await db.fetch("""
+                SELECT oi.id, oi.bebida_id, oi.tamano, oi.cantidad,
+                       oi.precio_final, oi.notas_item,
+                       dr.nombre AS nombre_bebida
+                FROM order_items oi
+                JOIN drinks dr ON dr.id = oi.bebida_id
+                WHERE oi.orden_id = $1::uuid
+            """, str(r["id"]))
+            d["items"] = [dict(i) for i in items_rows]
+            d["nombre_cliente"] = d.pop("cliente", "")
+            resultado.append(d)
+
+        return resultado
 
     # ══════════════════════════════════════════════════════
     # CU37 — Ver detalles completos de la orden
     # ══════════════════════════════════════════════════════
 
     async def obtener_detalle_orden(self, orden_id: str) -> Order:
-        """
-        Retorna todos los datos de la orden incluyendo ítems, notas
-        y personalización. CU37.
-        """
+        """Retorna todos los datos de la orden incluyendo ítems y notas. CU37."""
         db = await database.get_db()
         return await self._fetch_order(db, orden_id)
 
@@ -205,7 +235,6 @@ class ProductionService:
         """
         Cambia estado a 'lista' y calcula el tiempo de preparación.
         Corresponde a actualizarEstado('ListaParaRecoger') — CU42.
-        También dispara el evento para CU43 (lo maneja NotificationService).
         """
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
@@ -216,14 +245,14 @@ class ProductionService:
             try:
                 orden.registrar_tiempo_preparacion(umbral_seg)
             except ValueError:
-                pass  # si no hay fecha_inicio_prep no bloquea
+                pass
 
         await self._actualizar_estado_db(db, orden)
         return orden
 
     async def revertir_a_en_preparacion(self, orden_id: str) -> Order:
         """
-        Deshace el marcado como lista (ventana de 5 seg en la UI).
+        Deshace el marcado como lista.
         Corresponde a revertirEstado('EnPreparacion') — CU42.
         """
         db = await database.get_db()
@@ -238,8 +267,8 @@ class ProductionService:
 
     async def marcar_entregada(self, orden_id: str) -> Order:
         """
-        Finaliza el ciclo de producción marcando la orden como entregada.
-        Corresponde a cambiarEstado('Entregada') — CU44.
+        Finaliza el ciclo de producción. CU44.
+        Corresponde a cambiarEstado('Entregada').
         """
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
@@ -255,8 +284,7 @@ class ProductionService:
         self, orden_id: str, descripcion: str
     ) -> Order:
         """
-        Marca la orden con problema y registra la descripción.
-        Corresponde al flujo CU45.
+        Marca la orden con problema y registra la descripción. CU45.
         """
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
@@ -270,12 +298,10 @@ class ProductionService:
 
     async def obtener_ticket(self, orden_id: str) -> dict:
         """
-        Retorna los datos necesarios para reimprimir el ticket.
-        Corresponde a Proporcionar_numero_orden() → Enviar_a_impresora() — CU46.
+        Retorna los datos necesarios para reimprimir el ticket. CU46.
         """
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
-
         return {
             "codigo_orden": orden.codigo_orden,
             "estado": orden.estado,
@@ -295,11 +321,23 @@ class ProductionService:
         self, orden_id: str, umbral_seg: int = 600
     ) -> dict:
         """
-        Calcula y persiste el tiempo de preparación de la orden.
-        Alimenta las métricas del M03 (CU62).
+        Calcula y persiste el tiempo de preparación. CU47.
+        Si no hay fecha_inicio_prep o fecha_lista retorna sin error.
         """
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
+
+        # Solo calcular si hay fechas disponibles
+        if not orden.fecha_inicio_prep or not orden.fecha_lista:
+            return {
+                "orden_id": orden_id,
+                "tiempo_preparacion_seg": orden.tiempo_preparacion_seg,
+                "tiempo_preparacion_min": round((orden.tiempo_preparacion_seg or 0) / 60, 1),
+                "entregada_a_tiempo": orden.entregada_a_tiempo,
+                "umbral_seg": umbral_seg,
+                "nota": "Sin fechas de preparación registradas aún",
+            }
+
         tiempo = orden.registrar_tiempo_preparacion(umbral_seg)
         await self._actualizar_estado_db(db, orden)
         return {
@@ -311,15 +349,11 @@ class ProductionService:
         }
 
     # ══════════════════════════════════════════════════════
-    # Consultar estado (usado por M01 — CU14 cancelar)
+    # Usado por M01 — CU14 cancelar
     # ══════════════════════════════════════════════════════
 
     async def consultar_estado_produccion(self, orden_id: str) -> str:
-        """
-        Retorna el estado actual de producción.
-        Usado por M01 para verificar si una orden es cancelable.
-        Corresponde a consultarEstadoProduccion() — CU14.
-        """
+        """Retorna el estado actual. Usado por M01 CU14."""
         db = await database.get_db()
         estado = await db.fetchval(
             "SELECT estado FROM orders WHERE id = $1::uuid", orden_id
@@ -329,10 +363,7 @@ class ProductionService:
         return estado
 
     async def cancelar_en_produccion(self, orden_id: str) -> bool:
-        """
-        Cancela una orden si aún está en estado cancelable.
-        Usado por M01 CU14. Retorna True si se canceló.
-        """
+        """Cancela una orden si aún está en estado cancelable. CU14."""
         db = await database.get_db()
         orden = await self._fetch_order(db, orden_id)
         try:

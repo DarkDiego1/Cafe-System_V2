@@ -10,37 +10,36 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
 .shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
 .logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
 .logo span{color:var(--caramel);}
 .back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
-.pay-section{padding:16px 24px 12px;}
-.pay-section h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:14px;}
-.pay-method{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;transition:all .15s;}
-.pay-method.active{border-color:var(--caramel);background:#fdf4e3;box-shadow:0 0 0 3px rgba(196,127,43,.15);}
-.pm-icon{font-size:24px;width:36px;text-align:center;}
-.pm-label{font-size:15px;font-weight:500;}
-.pm-sub{font-size:12px;color:var(--latte);}
-.pm-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;}
-.pay-method.active .pm-check{background:var(--caramel);border-color:var(--caramel);color:#fff;}
-.card-fields{background:var(--mist);border:1px solid var(--warm);border-radius:14px;padding:14px;margin:10px 24px;}
-.card-fields .field{margin-bottom:10px;}
-.card-fields label{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--latte);}
-.card-fields input{width:100%;background:var(--cream);border:1.5px solid var(--warm);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--espresso);font-family:'DM Sans',sans-serif;outline:none;margin-top:4px;}
-.card-fields input:focus{border-color:var(--caramel);}
-.card-row{display:flex;gap:8px;}
-.card-row .field{flex:1;}
-.tip-section{padding:0 24px;margin-bottom:16px;}
-.tip-section h3{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
+.pay-section{padding:16px 20px 10px;}
+.pay-section h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:12px;}
+.pay-method{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;transition:all .15s;}
+.pay-method.active{border-color:var(--caramel);background:#fdf4e3;}
+.pm-icon{font-size:22px;width:32px;text-align:center;}
+.pm-label{font-size:14px;font-weight:500;}
+.pm-sub{font-size:11px;color:var(--latte);}
+.pm-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--warm);display:flex;align-items:center;justify-content:center;font-size:12px;}
+.pay-method.active .pm-check{background:var(--caramel);border-color:var(--caramel);color:#fff;content:'✓';}
+.tip-section{padding:0 20px 14px;}
+.tip-section h3{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:8px;}
 .tip-row{display:flex;gap:8px;}
-.tip-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:10px;padding:10px 8px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit;}
+.tip-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:10px;padding:9px 6px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit;}
 .tip-btn.active{border-color:var(--caramel);background:#fdf4e3;color:var(--caramel);}
-.pay-total{padding:14px 24px 4px;background:var(--foam);border-top:1px solid var(--warm);margin-top:auto;}
-.total-row{display:flex;justify-content:space-between;font-size:18px;font-weight:600;color:var(--espresso);margin-bottom:14px;}
+.pay-total{padding:14px 20px;background:var(--foam);border-top:1px solid var(--warm);margin-top:auto;}
+.total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:600;color:var(--espresso);margin-bottom:12px;}
 .total-row span:last-child{color:var(--caramel);}
-.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;margin-top:0;transition:background .15s;font-family:inherit;}
-.btn-full:hover{background:var(--roast);}
+.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;}
 .btn-full.gold{background:var(--gold);color:var(--espresso);}
+.btn-full:disabled{opacity:.5;cursor:not-allowed;}
+.error-msg{color:var(--danger);font-size:12px;text-align:center;margin-top:8px;min-height:18px;}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(44,26,14,.7);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.loading-overlay.show{display:flex;}
+.loading-overlay p{color:var(--cream);font-size:16px;}
+.spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -51,39 +50,25 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <span style="font-size:13px;color:var(--latte)">Pago seguro 🔒</span>
   </div>
 
+  <!-- Resumen del pedido -->
   <div class="pay-section">
+    <h2>Resumen del pedido</h2>
+    <div id="resumenItems" style="margin-bottom:14px;font-size:13px;color:var(--latte)"></div>
     <h2>Método de pago</h2>
-    <div class="pay-method active" id="pm-tarjeta" onclick="selPM('tarjeta')">
+    <div class="pay-method active" id="pm-efectivo" onclick="selPM('efectivo')">
+      <div class="pm-icon">💵</div>
+      <div><div class="pm-label">Efectivo</div><div class="pm-sub">Pago en caja al recoger</div></div>
+      <div class="pm-check">✓</div>
+    </div>
+    <div class="pay-method" id="pm-tarjeta" onclick="selPM('tarjeta')">
       <div class="pm-icon">💳</div>
       <div><div class="pm-label">Tarjeta</div><div class="pm-sub">Crédito o débito</div></div>
-      <div class="pm-check">✓</div>
+      <div class="pm-check"></div>
     </div>
     <div class="pay-method" id="pm-digital" onclick="selPM('digital')">
       <div class="pm-icon">📱</div>
       <div><div class="pm-label">Billetera digital</div><div class="pm-sub">Apple Pay · Google Pay</div></div>
       <div class="pm-check"></div>
-    </div>
-    <div class="pay-method" id="pm-efectivo" onclick="selPM('efectivo')">
-      <div class="pm-icon">💵</div>
-      <div><div class="pm-label">Efectivo</div><div class="pm-sub">Pago en caja</div></div>
-      <div class="pm-check"></div>
-    </div>
-    <div class="pay-method" id="pm-lealtad" onclick="selPM('lealtad')">
-      <div class="pm-icon">🏷️</div>
-      <div><div class="pm-label">Puntos de lealtad</div><div class="pm-sub" id="puntosDisp">2,480 pts disponibles</div></div>
-      <div class="pm-check"></div>
-    </div>
-  </div>
-
-  <!-- Campos de tarjeta (se ocultan según método) -->
-  <div class="card-fields" id="camposTarjeta">
-    <div class="field">
-      <label>Número de tarjeta</label>
-      <input type="text" id="numTarjeta" placeholder="4242 4242 4242 4242" maxlength="19">
-    </div>
-    <div class="card-row">
-      <div class="field"><label>Vencimiento</label><input type="text" id="vencimiento" placeholder="MM/AA" maxlength="5"></div>
-      <div class="field"><label>CVV</label><input type="text" id="cvv" placeholder="123" maxlength="4"></div>
     </div>
   </div>
 
@@ -91,40 +76,56 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     <h3>¿Quieres dejar propina?</h3>
     <div class="tip-row">
       <div class="tip-btn" onclick="selTip(this,0)">Sin propina</div>
-      <div class="tip-btn active" id="tipActual" onclick="selTip(this,10)">10%</div>
+      <div class="tip-btn active" onclick="selTip(this,10)">10%</div>
       <div class="tip-btn" onclick="selTip(this,15)">15%</div>
       <div class="tip-btn" onclick="selTip(this,20)">20%</div>
     </div>
   </div>
 
   <div class="pay-total">
-    <div class="total-row">
-      <span>Total a pagar</span>
-      <span id="totalPagar">$207.80</span>
+    <div class="total-row"><span>Subtotal</span><span id="subtotalEl">$0</span></div>
+    <div class="total-row" id="filaP" style="font-size:13px;font-weight:400">
+      <span style="color:var(--latte)">Propina (10%)</span><span id="propinaEl" style="color:var(--latte)">$0</span>
     </div>
-    <button class="btn-full gold" id="btnPagar" onclick="procesarPago()">Pagar $207.80 →</button>
+    <div class="total-row"><span>Total</span><span id="totalEl">$0</span></div>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-full gold" id="btnPagar" onclick="procesarPago()">Confirmar pedido →</button>
   </div>
 </div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Procesando tu pedido…</p>
+</div>
+
 <script>
-// Integración backend:
-// POST /api/pago/procesar → { metodo, datosMetodo, propina, total } → { exito, ordenId, codigo }
-// GET /api/cliente/puntos → { disponibles } (requiere sesión de lealtad)
+const API = 'http://localhost:8000/api';
+const carrito  = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+const subtotal = parseFloat(sessionStorage.getItem('subtotal') || '0');
+let metodoPago = 'efectivo';
+let propinaPct = 10;
 
-let metodoPago = 'tarjeta';
-let porcentajePropina = 10;
-const subtotal = 188;
+// ── Resumen ───────────────────────────────────────────────
+document.getElementById('resumenItems').innerHTML = carrito.map(i =>
+  `<div style="display:flex;justify-content:space-between;padding:3px 0">
+    <span>${i.nombre} ${i.tamano} ×${i.cantidad}</span>
+    <span>$${i.precio_final * i.cantidad}</span>
+  </div>`
+).join('');
 
-function calcularTotal() {
-  const propina = subtotal * porcentajePropina / 100;
-  return (subtotal + propina).toFixed(2);
+function actualizarTotales() {
+  const propina = Math.round(subtotal * propinaPct / 100);
+  const total   = subtotal + propina;
+  document.getElementById('subtotalEl').textContent = `$${subtotal}`;
+  document.getElementById('propinaEl').textContent  = `$${propina}`;
+  document.getElementById('totalEl').textContent    = `$${total}`;
+  document.getElementById('btnPagar').textContent   = `Confirmar pedido — $${total} →`;
+  sessionStorage.setItem('propina', propina);
+  sessionStorage.setItem('total_final', total);
 }
 
-function actualizarTotal() {
-  const total = calcularTotal();
-  document.getElementById('totalPagar').textContent = `$${total}`;
-  document.getElementById('btnPagar').textContent = `Pagar $${total} →`;
-}
-
+// ── Selección ─────────────────────────────────────────────
 function selPM(metodo) {
   metodoPago = metodo;
   document.querySelectorAll('.pay-method').forEach(pm => {
@@ -133,44 +134,80 @@ function selPM(metodo) {
   });
   document.getElementById(`pm-${metodo}`).classList.add('active');
   document.getElementById(`pm-${metodo}`).querySelector('.pm-check').textContent = '✓';
-  // Mostrar/ocultar campos de tarjeta
-  document.getElementById('camposTarjeta').style.display = metodo === 'tarjeta' ? 'block' : 'none';
 }
 
 function selTip(el, pct) {
   document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  porcentajePropina = pct;
-  actualizarTotal();
+  propinaPct = pct;
+  actualizarTotales();
 }
 
-function procesarPago() {
-  const datos = {
-    metodo: metodoPago,
-    propina: porcentajePropina,
-    total: calcularTotal(),
-    ...(metodoPago === 'tarjeta' && {
-      numTarjeta: document.getElementById('numTarjeta').value.replace(/\s/g,''),
-      vencimiento: document.getElementById('vencimiento').value,
-      cvv: document.getElementById('cvv').value
-    })
-  };
-  // TODO: fetch('/api/pago/procesar', { method:'POST', body: JSON.stringify(datos) })
-  //   .then(r=>r.json())
-  //   .then(data => { if(data.exito) window.location.href=`s7-confirmacion.html?orden=${data.ordenId}`; })
-  console.log('Procesar pago:', datos);
-  window.location.href = 's7-confirmacion.html'; // demo
+// ── Crear orden en el backend ─────────────────────────────
+async function procesarPago() {
+  if (!carrito.length) { document.getElementById('errorMsg').textContent = 'Tu carrito está vacío'; return; }
+
+  document.getElementById('btnPagar').disabled = true;
+  document.getElementById('errorMsg').textContent = '';
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  try {
+    const propina = parseFloat(sessionStorage.getItem('propina') || '0');
+    const total   = parseFloat(sessionStorage.getItem('total_final') || subtotal.toString());
+
+    // 1. Crear la orden
+    const orderPayload = {
+      cliente_id:      '00000000-0000-0000-0000-000000000000',
+      items: carrito.map(i => ({
+        bebida_id:   i.bebida_id,
+        tamano:      i.tamano,
+        cantidad:    i.cantidad,
+        precio_base: i.precio_base,
+        precio_final:i.precio_final,
+        notas_item:  i.notas_item || null,
+      })),
+      notas_generales: null,
+      cupon_codigo:    null,
+    };
+
+    const rOrder = await fetch(`${API}/customer/orders`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(orderPayload),
+    });
+
+    if (!rOrder.ok) {
+      const err = await rOrder.json();
+      throw new Error(err.detail || 'Error al crear la orden');
+    }
+
+    const ordenData = await rOrder.json();
+    const ordenId   = ordenData.orden_id || ordenData.id;
+
+    // 2. Registrar propina si hay
+    if (propina > 0) {
+      await fetch(`${API}/customer/payments/${ordenId}/tip`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ monto: propina }),
+      }).catch(() => {}); // no bloquear si falla
+    }
+
+    // 3. Guardar en sesión y continuar
+    sessionStorage.setItem('orden_id',     ordenId);
+    sessionStorage.setItem('codigo_orden', ordenData.codigo_orden || ordenData.codigo || ordenId.slice(0,8).toUpperCase());
+    sessionStorage.setItem('metodo_pago',  metodoPago);
+
+    window.location.href = `s7-confirmacion.html`;
+
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    document.getElementById('btnPagar').disabled = false;
+    document.getElementById('errorMsg').textContent = 'Error: ' + err.message;
+  }
 }
 
-// Formateo automático de tarjeta
-document.getElementById('numTarjeta').addEventListener('input', (e) => {
-  e.target.value = e.target.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim();
-});
-document.getElementById('vencimiento').addEventListener('input', (e) => {
-  e.target.value = e.target.value.replace(/\D/g,'').replace(/^(\d{2})(\d)/, '$1/$2');
-});
-
-actualizarTotal();
+actualizarTotales();
 </script>
 </body>
 </html>

@@ -10,43 +10,44 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
 .shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--warm);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:var(--cream);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--warm);}
 .logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
 .logo span{color:var(--caramel);}
 .back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
 .cart-pill{background:var(--espresso);color:var(--cream);border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
 .cart-pill .badge{background:var(--gold);color:var(--espresso);border-radius:10px;padding:1px 7px;font-size:12px;font-weight:600;}
-.custom-header{padding:20px 24px 16px;}
-.custom-header h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--espresso);}
+.custom-header{padding:16px 20px 12px;}
+.custom-header h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
 .price-live{font-size:24px;font-weight:600;color:var(--caramel);font-family:'Playfair Display',serif;margin-top:4px;}
-.drink-preview-wrap{background:var(--mist);border:1px solid var(--warm);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin:0 24px 16px;}
-.drink-preview-cup{font-size:52px;line-height:1;}
-.drink-preview-info h4{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;}
-.drink-preview-info p{font-size:12px;color:var(--latte);margin-top:3px;}
-.custom-section{padding:0 24px 18px;}
-.custom-section h3{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:12px;}
+.drink-preview-wrap{background:var(--mist);border:1px solid var(--warm);border-radius:16px;padding:14px;display:flex;align-items:center;gap:14px;margin:0 20px 16px;}
+.preview-img{width:64px;height:64px;border-radius:12px;object-fit:cover;background:var(--warm);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;flex-shrink:0;}
+.preview-img img{width:100%;height:100%;object-fit:cover;}
+.custom-section{padding:0 20px 16px;}
+.custom-section h3{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;}
 .size-row{display:flex;gap:8px;}
-.size-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;}
-.size-btn .si{font-size:24px;display:block;}
-.size-btn .sl{font-size:12px;font-weight:500;color:var(--espresso);margin-top:4px;display:block;}
+.size-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;}
+.size-btn .si{font-size:22px;display:block;}
+.size-btn .sl{font-size:12px;font-weight:500;color:var(--espresso);margin-top:3px;display:block;}
 .size-btn .sp{font-size:11px;color:var(--latte);}
-.size-btn.active{border-color:var(--caramel);background:#fdf4e3;box-shadow:0 0 0 3px rgba(196,127,43,.15);}
+.size-btn.active{border-color:var(--caramel);background:#fdf4e3;}
 .temp-row{display:flex;gap:8px;}
-.temp-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--espresso);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;}
+.temp-btn{flex:1;border:1.5px solid var(--warm);background:var(--mist);border-radius:12px;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--espresso);transition:all .15s;font-family:inherit;}
 .temp-btn.active{border-color:var(--caramel);background:#fdf4e3;}
 .ing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.ing-item{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;position:relative;}
-.ing-item .ing-icon{font-size:26px;display:block;margin-bottom:4px;}
-.ing-item .ing-name{font-size:11px;font-weight:500;color:var(--espresso);}
-.ing-item .ing-price{font-size:10px;color:var(--latte);}
-.ing-item.active{border-color:var(--caramel);background:#fdf4e3;}
-.ing-item.active::after{content:'✓';position:absolute;top:4px;right:6px;font-size:11px;color:var(--caramel);font-weight:700;}
+.ing-item{border:1.5px solid var(--warm);background:var(--mist);border-radius:14px;padding:10px 8px;text-align:center;position:relative;}
+.ing-icon{font-size:24px;display:block;margin-bottom:4px;height:32px;display:flex;align-items:center;justify-content:center;}
+.ing-icon img{width:32px;height:32px;border-radius:8px;object-fit:cover;}
+.ing-name{font-size:11px;font-weight:500;color:var(--espresso);}
+.ing-tag{font-size:10px;color:var(--latte);margin-top:2px;}
+.qty-row{display:flex;align-items:center;gap:14px;margin-bottom:4px;}
+.qty-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--warm);background:var(--cream);cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.qty-btn:hover{background:var(--warm);}
+.qty-num{font-size:20px;font-weight:600;min-width:28px;text-align:center;}
 .notes-input{width:100%;background:var(--mist);border:1.5px solid var(--warm);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--espresso);font-family:'DM Sans',sans-serif;resize:none;outline:none;}
 .notes-input:focus{border-color:var(--caramel);}
-.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
+.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;}
 .btn-primary:hover{background:var(--roast);}
-.btn-outline{flex:0 0 auto;background:none;border:1.5px solid var(--espresso);color:var(--espresso);border-radius:14px;padding:14px 16px;font-size:18px;cursor:pointer;transition:background .15s;}
-.btn-outline:hover{background:var(--warm);}
+.btn-outline{flex:0 0 auto;background:none;border:1.5px solid var(--espresso);color:var(--espresso);border-radius:14px;padding:14px 16px;font-size:18px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -54,19 +55,21 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="topbar">
     <button class="back-btn" onclick="window.location.href='s3-detalle.html'">←</button>
     <span class="logo">Nuevos <span>Horizontes</span></span>
-    <button class="cart-pill" onclick="window.location.href='s5-carrito.html'">🛒 <span class="badge" id="cartCount">2</span></button>
+    <button class="cart-pill" onclick="window.location.href='s5-carrito.html'">
+      🛒 <span class="badge" id="cartCount">0</span>
+    </button>
   </div>
 
   <div class="custom-header">
-    <h2>Personaliza tu Latte</h2>
-    <div class="price-live" id="priceLive">$65.00</div>
+    <h2 id="tituloPersonalizar">Personaliza tu bebida</h2>
+    <div class="price-live" id="priceLive">$0</div>
   </div>
 
   <div class="drink-preview-wrap">
-    <div class="drink-preview-cup" id="previewCup">☕</div>
-    <div class="drink-preview-info">
-      <h4 id="previewName">Latte Chico · Caliente</h4>
-      <p id="previewMods">Espresso · Leche entera · Espuma</p>
+    <div class="preview-img" id="previewImg">☕</div>
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600" id="previewName">—</div>
+      <div style="font-size:12px;color:var(--latte);margin-top:3px" id="previewMods">—</div>
     </div>
   </div>
 
@@ -74,14 +77,14 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
   <div class="custom-section">
     <h3>Tamaño</h3>
     <div class="size-row">
-      <div class="size-btn active" onclick="selSz(this,'Chico',0,'🥤')">
-        <span class="si">🥤</span><span class="sl">Chico</span><span class="sp">$65</span>
+      <div class="size-btn active" data-tamano="Chico" data-precio="0" onclick="selTamano(this)">
+        <span class="si">🥤</span><span class="sl">Chico</span><span class="sp" id="spChico">—</span>
       </div>
-      <div class="size-btn" onclick="selSz(this,'Mediano',15,'☕')">
-        <span class="si">☕</span><span class="sl">Mediano</span><span class="sp">$80</span>
+      <div class="size-btn" data-tamano="Mediano" data-precio="0" onclick="selTamano(this)">
+        <span class="si">☕</span><span class="sl">Mediano</span><span class="sp" id="spMediano">—</span>
       </div>
-      <div class="size-btn" onclick="selSz(this,'Grande',25,'🫖')">
-        <span class="si">🫖</span><span class="sl">Grande</span><span class="sp">$90</span>
+      <div class="size-btn" data-tamano="Grande" data-precio="0" onclick="selTamano(this)">
+        <span class="si">🫖</span><span class="sl">Grande</span><span class="sp" id="spGrande">—</span>
       </div>
     </div>
   </div>
@@ -96,96 +99,181 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
     </div>
   </div>
 
-  <!-- Ingredientes extras -->
+  <!-- Ingredientes base del backend -->
+  <div class="custom-section" id="secIngredientes" style="display:none">
+    <h3>Ingredientes base</h3>
+    <div class="ing-grid" id="ingGrid"></div>
+  </div>
+
+  <!-- Cantidad -->
   <div class="custom-section">
-    <h3>Ingredientes extras</h3>
-    <div class="ing-grid">
-      <div class="ing-item active" onclick="togIng(this,'Espresso',0)"><span class="ing-icon">☕</span><div class="ing-name">Espresso</div><div class="ing-price">Incluido</div></div>
-      <div class="ing-item active" onclick="togIng(this,'Leche',0)"><span class="ing-icon">🥛</span><div class="ing-name">Leche entera</div><div class="ing-price">Incluido</div></div>
-      <div class="ing-item" onclick="togIng(this,'Leche vegetal',8)"><span class="ing-icon">🌱</span><div class="ing-name">Leche vegetal</div><div class="ing-price">+$8</div></div>
-      <div class="ing-item" onclick="togIng(this,'Caramelo',5)"><span class="ing-icon">🍮</span><div class="ing-name">Caramelo</div><div class="ing-price">+$5</div></div>
-      <div class="ing-item" onclick="togIng(this,'Crema extra',10)"><span class="ing-icon">🍦</span><div class="ing-name">Crema extra</div><div class="ing-price">+$10</div></div>
-      <div class="ing-item" onclick="togIng(this,'Canela',3)"><span class="ing-icon">🌿</span><div class="ing-name">Canela</div><div class="ing-price">+$3</div></div>
-      <div class="ing-item" onclick="togIng(this,'Vainilla',5)"><span class="ing-icon">🌸</span><div class="ing-name">Vainilla</div><div class="ing-price">+$5</div></div>
-      <div class="ing-item" onclick="togIng(this,'Chocolate',8)"><span class="ing-icon">🍫</span><div class="ing-name">Chocolate</div><div class="ing-price">+$8</div></div>
-      <div class="ing-item" onclick="togIng(this,'Avellana',6)"><span class="ing-icon">🌰</span><div class="ing-name">Avellana</div><div class="ing-price">+$6</div></div>
+    <h3>Cantidad</h3>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
+      <span class="qty-num" id="cantidad">1</span>
+      <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
     </div>
   </div>
 
   <!-- Notas -->
   <div class="custom-section">
     <h3>Notas especiales</h3>
-    <textarea class="notes-input" id="notasCliente" rows="2" placeholder="Ej: sin azúcar, extra hielo, leche de almendras…"></textarea>
+    <textarea class="notes-input" id="notasCliente" rows="2"
+      placeholder="Ej: sin azúcar, extra hielo, leche de almendras…"></textarea>
   </div>
 
-  <div style="padding:0 24px 24px;display:flex;gap:10px;">
+  <div style="padding:0 20px 28px;display:flex;gap:10px;">
     <button class="btn-outline" onclick="window.location.href='s3-detalle.html'">←</button>
     <button class="btn-primary" id="btnAgregar" onclick="agregarAlCarrito()">Agregar al carrito</button>
   </div>
 </div>
+
 <script>
-// Integración backend:
-// GET /api/menu/bebida/:id/personalizacion → { tamanos, temperaturas, extras }
-// POST /api/carrito/agregar → { productoId, tamano, temperatura, extras, notas, cantidad }
+const API       = 'http://localhost:8000/api';
+const KIOSCO_ID = '00000000-0000-0000-0000-000000000000';
 
-let precioBase = 65;
-let extraTamano = 0;
-let extraIngredientes = 0;
+let bebida      = null;
+let tamanoSel   = 'Chico';
+let temperatSel = 'Caliente';
+let cantidad    = 1;
 
-function actualizarPrecio() {
-  const total = precioBase + extraTamano + extraIngredientes;
-  document.getElementById('priceLive').textContent = `$${total}.00`;
+// ── Cargar bebida del sessionStorage + ingredientes reales ─
+async function cargarBebida() {
+  const str = sessionStorage.getItem('bebida_actual');
+  if (!str) { window.location.href = 's2-categorias.html'; return; }
+  bebida = JSON.parse(str);
+
+  document.getElementById('tituloPersonalizar').textContent = `Personaliza: ${bebida.nombre}`;
+
+  // Preview imagen
+  const prev = document.getElementById('previewImg');
+  if (bebida.imagen_url) {
+    prev.innerHTML = `<img src="${bebida.imagen_url}" alt="${bebida.nombre}"
+      onerror="this.parentElement.innerHTML='☕'">`;
+  } else {
+    prev.textContent = '☕';
+  }
+
+  // Precios por tamaño
+  const pc = bebida.precio_chico   || 0;
+  const pm = bebida.precio_mediano || Math.round(pc * 1.2);
+  const pg = bebida.precio_grande  || Math.round(pc * 1.4);
+
+  document.getElementById('spChico').textContent   = `$${pc}`;
+  document.getElementById('spMediano').textContent = `$${pm}`;
+  document.getElementById('spGrande').textContent  = `$${pg}`;
+  document.querySelector('[data-tamano="Chico"]').dataset.precio   = pc;
+  document.querySelector('[data-tamano="Mediano"]').dataset.precio = pm;
+  document.querySelector('[data-tamano="Grande"]').dataset.precio  = pg;
+
+  actualizarPreview();
+  actualizarPrecio();
+
+  // Cargar ingredientes reales
+  await cargarIngredientes(bebida.id);
 }
 
-function selSz(el, lbl, extra, ico) {
+async function cargarIngredientes(bebidaId) {
+  try {
+    const r = await fetch(`${API}/customer/drinks/${bebidaId}`);
+    if (!r.ok) return;
+    const d = await r.json();
+
+    // El endpoint puede retornar los ingredientes en distintos campos
+    const ings = d.ingredientes || d.recipe || d.bebida?.ingredientes
+               || d.receta?.ingredientes || [];
+
+    if (!ings.length) return;
+
+    document.getElementById('secIngredientes').style.display = 'block';
+    document.getElementById('ingGrid').innerHTML = ings.map(ing => {
+      const nombre = ing.nombre || ing.name || '?';
+      const cant   = ing.cantidad ? `${ing.cantidad} ${ing.unidad_medida || ing.unidad || ''}`.trim() : '';
+      const imgSrc = ing.imagen_url || ing.image_url || '';
+
+      const iconHtml = imgSrc
+        ? `<div class="ing-icon"><img src="${imgSrc}" alt="${nombre}"
+             onerror="this.innerHTML='🍃'"></div>`
+        : `<div class="ing-icon">🍃</div>`;
+
+      return `<div class="ing-item">
+        ${iconHtml}
+        <div class="ing-name">${nombre}</div>
+        ${cant ? `<div class="ing-tag">${cant}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    // No crítico — simplemente no se muestran ingredientes
+  }
+}
+
+function actualizarCarritoCount() {
+  const c = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+  document.getElementById('cartCount').textContent = c.reduce((s,i)=>s+i.cantidad,0);
+}
+
+function selTamano(el) {
   document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  extraTamano = extra;
-  document.getElementById('previewCup').textContent = ico;
-  const nm = document.getElementById('previewName');
-  const temp = nm.textContent.split('·')[1]?.trim() || 'Caliente';
-  nm.textContent = `Latte ${lbl} · ${temp}`;
+  tamanoSel = el.dataset.tamano;
+  actualizarPreview();
   actualizarPrecio();
 }
 
-function selTemp(el, lbl) {
+function selTemp(el, temp) {
   document.querySelectorAll('.temp-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  const nm = document.getElementById('previewName');
-  const sz = nm.textContent.split('·')[0]?.trim() || 'Latte Chico';
-  nm.textContent = `${sz} · ${lbl}`;
+  temperatSel = temp;
+  actualizarPreview();
 }
 
-function togIng(el, nombre, precio) {
-  el.classList.toggle('active');
-  extraIngredientes += el.classList.contains('active') ? precio : -precio;
-  const mods = [...document.querySelectorAll('.ing-item.active')]
-    .map(i => i.querySelector('.ing-name').textContent).join(' · ');
-  document.getElementById('previewMods').textContent = mods;
+function cambiarCantidad(delta) {
+  cantidad = Math.max(1, Math.min(10, cantidad + delta));
+  document.getElementById('cantidad').textContent = cantidad;
   actualizarPrecio();
+}
+
+function actualizarPreview() {
+  if (!bebida) return;
+  document.getElementById('previewName').textContent =
+    `${bebida.nombre} · ${tamanoSel} · ${temperatSel}`;
+  document.getElementById('previewMods').textContent =
+    bebida.descripcion ? bebida.descripcion.slice(0, 50) + '…' : '';
+}
+
+function actualizarPrecio() {
+  if (!bebida) return;
+  const btn    = document.querySelector('.size-btn.active');
+  const precio = parseFloat(btn?.dataset.precio || bebida.precio_chico || 0);
+  const total  = precio * cantidad;
+  document.getElementById('priceLive').textContent  = `$${total.toFixed(0)}`;
+  document.getElementById('btnAgregar').textContent = `Agregar al carrito — $${total.toFixed(0)}`;
 }
 
 function agregarAlCarrito() {
+  const btn    = document.querySelector('.size-btn.active');
+  const precio = parseFloat(btn?.dataset.precio || bebida.precio_chico || 0);
+
   const item = {
-    id: Date.now(),
-    productoId: new URLSearchParams(window.location.search).get('producto') || 'cafe-latte',
-    nombre: document.getElementById('previewName').textContent,
-    emoji: document.getElementById('previewCup').textContent,
-    precio: precioBase + extraTamano + extraIngredientes,
-    cantidad: 1,
-    mods: document.getElementById('previewMods').textContent,
-    notas: document.getElementById('notasCliente').value
+    bebida_id:   bebida.id,
+    nombre:      bebida.nombre,
+    imagen_url:  bebida.imagen_url || null,
+    tamano:      tamanoSel,
+    temperatura: temperatSel,
+    precio_base: precio,
+    precio_final:precio,
+    cantidad:    cantidad,
+    notas_item:  document.getElementById('notasCliente').value || null,
   };
 
-  // Guardar en carrito local
   const carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
   carrito.push(item);
   sessionStorage.setItem('carrito', JSON.stringify(carrito));
-
-  // TODO: POST /api/carrito/agregar → sincronizar con backend (sesión de kiosco)
-  console.log('Agregar al carrito:', item);
   window.location.href = 's5-carrito.html';
 }
+
+cargarBebida();
+actualizarCarritoCount();
 </script>
 </body>
 </html>

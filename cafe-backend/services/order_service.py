@@ -31,13 +31,6 @@ ESTADOS_CANCELABLES = {"pendiente", "pagado", "Pendiente", "Pagado"}
 
 
 class OrderService:
-    """
-    Gestiona el ciclo de vida de una orden desde el carrito
-    hasta que se envía a producción.
-
-    Atributos del diagrama:
-        total: Double — calculado en recalcularTotal()
-    """
 
     # ── CU05: precio en tiempo real ───────────────────────────────────
 
@@ -48,7 +41,7 @@ class OrderService:
         ingredientes_personalizados: list[dict],
     ) -> dict:
         """Corresponde a recalcularTotal() — CU05."""
-        db  = await database.get_db()
+        db = await database.get_db()
         col = {
             "chico": "precio_chico", "mediano": "precio_mediano",
             "grande": "precio_grande",
@@ -70,9 +63,9 @@ class OrderService:
 
         total = round(precio_base + costo_extras, 2)
         return {
-            "precio_base":   precio_base,
-            "costo_extras":  round(costo_extras, 2),
-            "total":         total,
+            "precio_base":  precio_base,
+            "costo_extras": round(costo_extras, 2),
+            "total":        total,
         }
 
     # ── CU12: crear orden ─────────────────────────────────────────────
@@ -111,40 +104,41 @@ class OrderService:
 
         # Código único de orden
         ultimo = await db.fetchval("SELECT COUNT(*) FROM orders") or 0
-        codigo_orden = f"ORD-{str(ultimo + 1).zfill(4)}"
+        codigo_orden = f"ORD-{datetime.now().strftime('%Y%m%d')}-{str(ultimo + 1).zfill(4)}"
 
-        async with db.transaction():
-            orden = await db.fetchrow("""
-                INSERT INTO orders
-                    (cliente_id, codigo_orden, estado, subtotal, descuento,
-                     total, notas_generales, cupon_codigo,
-                     fecha_creacion, fecha_actualizacion)
-                VALUES ($1::uuid, $2, 'Pendiente', $3, $4, $5, $6, $7, NOW(), NOW())
-                RETURNING id, codigo_orden, total
-            """, cliente_id, codigo_orden, subtotal, descuento,
-                total, notas_generales, cupon_codigo)
+        # Usar acquire() para obtener una conexión real del pool y poder usar transaction()
+        async with db.acquire() as conn:
+            async with conn.transaction():
+                orden = await conn.fetchrow("""
+                    INSERT INTO orders
+                        (cliente_id, codigo_orden, estado, subtotal, descuento,
+                         total, notas_generales, cupon_codigo,
+                         fecha_creacion, fecha_actualizacion)
+                    VALUES ($1::uuid, $2, 'Pendiente', $3, $4, $5, $6, $7, NOW(), NOW())
+                    RETURNING id, codigo_orden, total
+                """, cliente_id, codigo_orden, subtotal, descuento,
+                    total, notas_generales, cupon_codigo)
 
-            orden_id = str(orden["id"])
+                orden_id = str(orden["id"])
 
-            for item in items:
-                # Normalizar tamaño al valor real de la BD
-                tamano_real = TAMANO_MAP.get(
-                    item.get("tamano", "Mediano"), "Mediano"
-                )
-                await db.execute("""
-                    INSERT INTO order_items
-                        (orden_id, bebida_id, tamano, precio_base,
-                         precio_final, cantidad, notas_item)
-                    VALUES ($1::uuid, $2, $3, $4, $5, $6, $7)
-                """,
-                    orden_id,
-                    item["bebida_id"],
-                    tamano_real,
-                    float(item.get("precio_base", 0)),
-                    float(item.get("precio_final", 0)),
-                    int(item.get("cantidad", 1)),
-                    item.get("notas_item"),
-                )
+                for item in items:
+                    tamano_real = TAMANO_MAP.get(
+                        item.get("tamano", "Mediano"), "Mediano"
+                    )
+                    await conn.execute("""
+                        INSERT INTO order_items
+                            (orden_id, bebida_id, tamano, precio_base,
+                             precio_final, cantidad, notas_item)
+                        VALUES ($1::uuid, $2, $3, $4, $5, $6, $7)
+                    """,
+                        orden_id,
+                        item["bebida_id"],
+                        tamano_real,
+                        float(item.get("precio_base", 0)),
+                        float(item.get("precio_final", 0)),
+                        int(item.get("cantidad", 1)),
+                        item.get("notas_item"),
+                    )
 
         return {
             "orden_id":     orden_id,

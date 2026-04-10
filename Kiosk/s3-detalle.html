@@ -3,105 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kiosco — S3 Detalle de Bebida</title>
+<title>Kiosco — S3 Bebidas</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--cream:#F5EDD8;--warm:#EAD7B0;--espresso:#2C1A0E;--roast:#4A2C1A;--caramel:#C47F2B;--gold:#E8A830;--latte:#8B5E3C;--foam:#FBF5E6;--mist:#F0E6CF;--success:#3A7D44;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
 .shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
-.drink-hero{height:220px;background:linear-gradient(135deg,#5c3820,#2c1a0e);display:flex;align-items:center;justify-content:center;font-size:96px;position:relative;}
-.hero-back{position:absolute;top:18px;left:18px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;width:38px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
-.hero-back:hover{background:rgba(255,255,255,.25);}
-.hero-fav{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:12px;width:38px;height:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
-.drink-info{padding:20px 24px;}
-.drink-info h2{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--espresso);}
-.tagline{font-size:14px;color:var(--latte);margin:4px 0 12px;}
-.price-row-d{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.price-big{font-size:28px;font-weight:600;color:var(--caramel);font-family:'Playfair Display',serif;}
-.rating-chip{background:var(--mist);border:1px solid var(--warm);border-radius:20px;padding:5px 12px;font-size:13px;color:var(--espresso);display:flex;align-items:center;gap:4px;}
-.tags-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.tag{background:var(--mist);border:1px solid var(--warm);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--latte);}
-.desc-text{font-size:14px;line-height:1.6;color:var(--roast);margin-bottom:16px;}
-.nut-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
-.nut{background:var(--mist);border:1px solid var(--warm);border-radius:12px;padding:10px 6px;text-align:center;}
-.nut .nv{font-size:14px;font-weight:600;color:var(--caramel);}
-.nut .nl{font-size:10px;color:var(--latte);}
-.ing-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
-.ing-chip{background:var(--espresso);color:var(--cream);border-radius:10px;padding:5px 12px;font-size:12px;}
-.cta-row{display:flex;gap:10px;padding:0 24px 24px;}
-.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;}
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:var(--cream);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--warm);}
+.logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
+.logo span{color:var(--caramel);}
+.back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
+.cart-pill{background:var(--espresso);color:var(--cream);border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.cart-pill .badge{background:var(--gold);color:var(--espresso);border-radius:10px;padding:1px 7px;font-size:12px;font-weight:600;}
+/* Lista de bebidas */
+.cat-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;padding:16px 20px 8px;}
+.drinks-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px 100px;}
+.drink-card{background:var(--foam);border:1px solid var(--warm);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .15s;}
+.drink-card:hover{transform:scale(1.02);}
+.dc-img{height:130px;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:52px;overflow:hidden;position:relative;}
+.dc-img img{width:100%;height:100%;object-fit:cover;}
+.dc-img .unavail-badge{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;border-radius:10px;padding:2px 8px;}
+.dc-body{padding:12px;}
+.dc-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+.dc-desc{font-size:11px;color:var(--latte);margin-bottom:8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.dc-footer{display:flex;align-items:center;justify-content:space-between;}
+.dc-price{font-size:15px;font-weight:600;color:var(--caramel);}
+.dc-btn{background:var(--espresso);color:var(--cream);border:none;border-radius:10px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:inherit;}
+.dc-unavail{opacity:.5;pointer-events:none;}
+/* Detalle de bebida (modal) */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--cream);border-radius:24px 24px 0 0;width:100%;max-height:90vh;overflow-y:auto;}
+.drink-hero{height:220px;background:linear-gradient(135deg,#5c3820,#2c1a0e);display:flex;align-items:center;justify-content:center;font-size:96px;position:relative;overflow:hidden;}
+.drink-hero img{width:100%;height:100%;object-fit:cover;}
+.hero-close{position:absolute;top:14px;left:14px;background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:12px;width:36px;height:36px;cursor:pointer;font-size:18px;}
+.drink-info{padding:18px 20px;}
+.drink-info h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;}
+.tagline{font-size:13px;color:var(--latte);margin:4px 0 12px;}
+.price-big{font-size:26px;font-weight:600;color:var(--caramel);font-family:'Playfair Display',serif;margin-bottom:12px;}
+.desc-text{font-size:14px;line-height:1.6;color:var(--roast);margin-bottom:14px;}
+.ing-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.ing-chip{background:var(--espresso);color:var(--cream);border-radius:10px;padding:4px 10px;font-size:11px;}
+.cta-row{display:flex;gap:10px;padding:0 20px 24px;}
+.btn-primary{flex:1;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;}
 .btn-primary:hover{background:var(--roast);}
-.btn-outline{flex:0 0 auto;background:none;border:1.5px solid var(--espresso);color:var(--espresso);border-radius:14px;padding:14px 16px;font-size:18px;cursor:pointer;transition:background .15s;}
-.btn-outline:hover{background:var(--warm);}
-.btn-outline.fav{color:var(--danger);border-color:var(--danger);}
 </style>
 </head>
 <body>
 <div class="shell">
-  <div class="drink-hero" id="drinkHero">
-    <button class="hero-back" onclick="window.location.href='s2-categorias.html'">←</button>
-    <span id="drinkEmoji">☕</span>
-    <button class="hero-fav" id="btnFav" onclick="toggleFav()">♡</button>
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='s2-categorias.html'">←</button>
+    <span class="logo">Nuevos <span>Horizontes</span></span>
+    <button class="cart-pill" onclick="window.location.href='s5-carrito.html'">
+      🛒 <span class="badge" id="cartCount">0</span>
+    </button>
   </div>
 
-  <div class="drink-info">
-    <h2 id="drinkNombre">Café Latte Clásico</h2>
-    <div class="tagline" id="drinkTagline">Espresso suave con leche vaporizada cremosa</div>
-
-    <div class="price-row-d">
-      <div class="price-big" id="drinkPrecio">$65.00</div>
-      <div class="rating-chip">⭐ <span id="drinkRating">4.8</span> <span style="color:var(--latte);font-size:11px" id="drinkReviews">(234)</span></div>
-    </div>
-
-    <div class="tags-row" id="drinkTags">
-      <span class="tag">☕ Cafeinado</span>
-      <span class="tag">🥛 Con lácteos</span>
-      <span class="tag">🔥 Caliente</span>
-    </div>
-
-    <div class="desc-text" id="drinkDesc">Doble shot de espresso de origen Veracruz, con leche entera vaporizada a 65°C. Notas de chocolate y nuez tostada en cada sorbo.</div>
-
-    <div class="nut-row">
-      <div class="nut"><div class="nv" id="kcal">120</div><div class="nl">Kcal</div></div>
-      <div class="nut"><div class="nv" id="grasa">6g</div><div class="nl">Grasa</div></div>
-      <div class="nut"><div class="nv" id="carbos">10g</div><div class="nl">Carbos</div></div>
-      <div class="nut"><div class="nv" id="cafeina">80mg</div><div class="nl">Cafeína</div></div>
-    </div>
-
-    <p style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:8px;">Ingredientes base</p>
-    <div class="ing-chips" id="drinkIngs">
-      <div class="ing-chip">☕ Espresso ×2</div>
-      <div class="ing-chip">🥛 Leche entera</div>
-      <div class="ing-chip">💨 Espuma</div>
-    </div>
-  </div>
-
-  <div class="cta-row">
-    <button class="btn-outline" id="btnFavCTA" onclick="toggleFav()">♡</button>
-    <button class="btn-primary" onclick="window.location.href='s4-personalizar.html'">Personalizar bebida →</button>
+  <div class="cat-title" id="catTitle">Cargando…</div>
+  <div class="drinks-grid" id="drinksGrid">
+    <div style="grid-column:1/-1;text-align:center;color:var(--latte);padding:40px">Cargando bebidas…</div>
   </div>
 </div>
+
+<!-- Modal de detalle -->
+<div class="modal-overlay" id="modalDetalle">
+  <div class="modal">
+    <div class="drink-hero" id="modalHero">
+      <button class="hero-close" onclick="cerrarModal()">←</button>
+      <span id="modalEmoji">☕</span>
+    </div>
+    <div class="drink-info">
+      <h2 id="modalNombre">—</h2>
+      <div class="tagline" id="modalTagline">—</div>
+      <div class="price-big" id="modalPrecio">—</div>
+      <div class="desc-text" id="modalDesc">—</div>
+      <p style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:8px">Ingredientes base</p>
+      <div class="ing-chips" id="modalIngs"></div>
+    </div>
+    <div class="cta-row">
+      <button class="btn-primary" id="btnPersonalizar" onclick="irPersonalizar()">Personalizar bebida →</button>
+    </div>
+  </div>
+</div>
+
 <script>
-// Integración backend:
-// GET /api/menu/bebida/:id → { nombre, emoji, tagline, precio, rating, reviews, tags, descripcion, nutricion, ingredientes }
-// GET /api/menu/bebida/:id/favorito → { esFavorito }
-// POST /api/menu/bebida/:id/favorito → toggle favorito (requiere sesión cliente)
+const API = 'http://localhost:8000/api';
+let bebidaSeleccionada = null;
 
-const params = new URLSearchParams(window.location.search);
-const productoId = params.get('producto') || 'cafe-latte';
-// TODO: fetch(`/api/menu/bebida/${productoId}`).then(r=>r.json()).then(renderDetalle)
-
-let esFavorito = false;
-function toggleFav() {
-  esFavorito = !esFavorito;
-  const icono = esFavorito ? '♥' : '♡';
-  document.getElementById('btnFav').textContent = icono;
-  document.getElementById('btnFavCTA').textContent = icono;
-  document.getElementById('btnFavCTA').classList.toggle('fav', esFavorito);
-  // TODO: POST /api/menu/bebida/${productoId}/favorito
-  console.log('Toggle favorito:', productoId, esFavorito);
+// ── Carrito ───────────────────────────────────────────────
+function actualizarCarrito() {
+  const c = JSON.parse(sessionStorage.getItem('carrito') || '[]');
+  document.getElementById('cartCount').textContent = c.reduce((s,i)=>s+i.cantidad,0);
 }
+actualizarCarrito();
+
+// ── Cargar bebidas ────────────────────────────────────────
+async function cargarBebidas() {
+  const catId     = sessionStorage.getItem('categoria_id');
+  const catNombre = sessionStorage.getItem('categoria_nombre') || 'Menú';
+  const bebidaId  = sessionStorage.getItem('bebida_id');
+
+  document.getElementById('catTitle').textContent = catNombre;
+
+  try {
+    let bebidas = [];
+
+    if (bebidaId) {
+      // Vino directo a una bebida — cargar toda la categoría donde está
+      const rFull = await fetch(`${API}/customer/menu/full`);
+      const cats  = rFull.ok ? await rFull.json() : [];
+      for (const cat of cats) {
+        const encontrada = (cat.bebidas || []).find(b => String(b.id) === String(bebidaId));
+        if (encontrada) {
+          bebidas = cat.bebidas || [];
+          document.getElementById('catTitle').textContent = cat.nombre;
+          sessionStorage.setItem('categoria_nombre', cat.nombre);
+          break;
+        }
+      }
+      // Abrir modal de la bebida seleccionada
+      if (bebidas.length) {
+        const b = bebidas.find(x => String(x.id) === String(bebidaId));
+        if (b) setTimeout(() => abrirModal(b), 300);
+      }
+      sessionStorage.removeItem('bebida_id');
+    } else if (catId) {
+      const r = await fetch(`${API}/customer/menu/categories/${catId}/drinks`);
+      if (r.ok) {
+        const data = await r.json();
+        bebidas = data.bebidas || data || [];
+      }
+    } else {
+      // Sin contexto — cargar menú completo
+      const r = await fetch(`${API}/customer/menu/full`);
+      const cats = r.ok ? await r.json() : [];
+      cats.forEach(cat => bebidas.push(...(cat.bebidas||[])));
+      document.getElementById('catTitle').textContent = 'Todas las bebidas';
+    }
+
+    renderBebidas(bebidas);
+  } catch(err) {
+    document.getElementById('drinksGrid').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;color:var(--danger);padding:40px">Error: ${err.message}</div>`;
+  }
+}
+
+function renderBebidas(bebidas) {
+  const activas = bebidas.filter(b => b.activo !== false);
+  if (!activas.length) {
+    document.getElementById('drinksGrid').innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;color:var(--latte);padding:40px">Sin bebidas en esta categoría</div>';
+    return;
+  }
+
+  document.getElementById('drinksGrid').innerHTML = activas.map(b => {
+    const img = b.imagen_url
+      ? `<img src="${b.imagen_url}" alt="${b.nombre}" onerror="this.parentElement.innerHTML='☕'">`
+      : '☕';
+    const disponible = b.disponible !== false;
+    return `<div class="drink-card ${!disponible?'dc-unavail':''}" onclick="abrirModal(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+      <div class="dc-img">
+        ${img}
+        ${!disponible ? '<div class="unavail-badge">No disponible</div>' : ''}
+      </div>
+      <div class="dc-body">
+        <div class="dc-name">${b.nombre}</div>
+        <div class="dc-desc">${b.descripcion || ''}</div>
+        <div class="dc-footer">
+          <div class="dc-price">$${b.precio_chico || 0}</div>
+          <button class="dc-btn">Ver</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Modal de detalle ──────────────────────────────────────
+function abrirModal(b) {
+  if (typeof b === 'string') b = JSON.parse(b);
+  bebidaSeleccionada = b;
+
+  // Hero con imagen o emoji
+  const hero = document.getElementById('modalHero');
+  if (b.imagen_url) {
+    hero.innerHTML = `
+      <button class="hero-close" onclick="cerrarModal()">←</button>
+      <img src="${b.imagen_url}" alt="${b.nombre}" style="width:100%;height:100%;object-fit:cover"
+           onerror="this.parentElement.innerHTML='<button class=hero-close onclick=cerrarModal()>←</button><span style=font-size:96px>☕</span>'">`;
+  } else {
+    hero.innerHTML = `<button class="hero-close" onclick="cerrarModal()">←</button><span style="font-size:96px">☕</span>`;
+  }
+
+  document.getElementById('modalNombre').textContent  = b.nombre;
+  document.getElementById('modalTagline').textContent = b.descripcion ? b.descripcion.slice(0,60)+'…' : '';
+  document.getElementById('modalPrecio').textContent  = `Desde $${b.precio_chico || 0}`;
+  document.getElementById('modalDesc').textContent    = b.descripcion || 'Bebida preparada con los mejores ingredientes.';
+
+  // Ingredientes
+  const ings = b.ingredientes || [];
+  document.getElementById('modalIngs').innerHTML = ings.length
+    ? ings.map(i => `<div class="ing-chip">${i.nombre || i}</div>`).join('')
+    : '<div class="ing-chip">☕ Espresso</div><div class="ing-chip">🥛 Leche</div>';
+
+  document.getElementById('modalDetalle').classList.add('open');
+}
+
+function cerrarModal() {
+  document.getElementById('modalDetalle').classList.remove('open');
+  bebidaSeleccionada = null;
+}
+
+function irPersonalizar() {
+  if (!bebidaSeleccionada) return;
+  sessionStorage.setItem('bebida_actual', JSON.stringify(bebidaSeleccionada));
+  window.location.href = 's4-personalizar.html';
+}
+
+// Cerrar modal al hacer click fuera
+document.getElementById('modalDetalle').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) cerrarModal();
+});
+
+cargarBebidas();
 </script>
 </body>
 </html>

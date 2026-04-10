@@ -10,37 +10,30 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espresso);min-height:100vh;display:flex;flex-direction:column;}
 .shell{width:100%;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;background:var(--cream);border-bottom:1px solid var(--warm);}
 .logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--espresso);}
 .logo span{color:var(--caramel);}
 .back-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--latte);padding:4px 8px;border-radius:8px;}
-.cart-content{padding:16px 24px;flex:1;}
-.cart-content h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:16px;}
-.cart-item{background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
-.ci-icon{font-size:38px;flex-shrink:0;}
+.cart-content{padding:16px 20px;flex:1;}
+.cart-content h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:14px;}
+.cart-item{background:var(--foam);border:1px solid var(--warm);border-radius:16px;padding:12px;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px;}
+.ci-img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden;}
+.ci-img img{width:100%;height:100%;object-fit:cover;}
 .ci-body{flex:1;}
-.ci-name{font-weight:500;font-size:15px;}
-.ci-mods{font-size:12px;color:var(--latte);margin-top:3px;}
-.ci-actions{display:flex;align-items:center;gap:8px;margin-top:10px;}
-.qty-btn{width:28px;height:28px;border-radius:8px;border:1.5px solid var(--warm);background:var(--cream);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--espresso);transition:background .15s;}
-.qty-btn:hover{background:var(--warm);}
-.qty-num{font-size:15px;font-weight:500;min-width:20px;text-align:center;}
-.ci-price{font-size:15px;font-weight:600;color:var(--caramel);white-space:nowrap;}
-.ci-del{background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;padding:4px;flex-shrink:0;}
-.sugg-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-top:10px;}
-.sugg-card{background:var(--foam);border:1px solid var(--warm);border-radius:14px;padding:12px;text-align:center;cursor:pointer;flex-shrink:0;width:90px;transition:transform .15s;}
-.sugg-card:hover{transform:translateY(-2px);}
-.sc-icon{font-size:28px;}
-.sc-name{font-size:11px;font-weight:500;margin-top:4px;}
-.sc-price{font-size:11px;color:var(--latte);}
-.cart-summary{background:var(--foam);border-top:1px solid var(--warm);padding:16px 24px;}
+.ci-name{font-weight:500;font-size:14px;}
+.ci-mods{font-size:11px;color:var(--latte);margin-top:2px;}
+.ci-actions{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.qty-btn{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--warm);background:var(--cream);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--espresso);}
+.qty-num{font-size:14px;font-weight:500;min-width:18px;text-align:center;}
+.ci-price{font-size:14px;font-weight:600;color:var(--caramel);white-space:nowrap;}
+.ci-del{background:none;border:none;cursor:pointer;color:var(--danger);font-size:17px;padding:2px;flex-shrink:0;}
+.cart-summary{background:var(--foam);border-top:1px solid var(--warm);padding:16px 20px;}
 .summary-row{display:flex;justify-content:space-between;font-size:14px;color:var(--latte);margin-bottom:6px;}
 .summary-row.total{font-size:18px;font-weight:600;color:var(--espresso);border-top:1px solid var(--warm);padding-top:10px;margin-top:6px;}
 .summary-row.total span:last-child{color:var(--caramel);}
-.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:500;cursor:pointer;margin-top:14px;transition:background .15s;font-family:inherit;}
+.btn-full{width:100%;background:var(--espresso);color:var(--cream);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:500;cursor:pointer;margin-top:12px;font-family:inherit;}
 .btn-full.gold{background:var(--gold);color:var(--espresso);}
-.btn-full.gold:hover{opacity:.9;}
-.empty-cart{text-align:center;padding:60px 24px;color:var(--latte);}
+.empty-cart{text-align:center;padding:60px 20px;color:var(--latte);}
 .empty-cart .ec-icon{font-size:64px;margin-bottom:16px;}
 .empty-cart h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--espresso);margin-bottom:8px;}
 </style>
@@ -55,91 +48,97 @@ body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--espres
 
   <div class="cart-content">
     <h2>Tu carrito</h2>
-    <div id="listaItems">
-      <!-- Se renderiza dinámicamente -->
-      <div class="cart-item">
-        <div class="ci-icon">☕</div>
-        <div class="ci-body">
-          <div class="ci-name">Café Latte Clásico</div>
-          <div class="ci-mods">Mediano · Caliente · +Caramelo · +Canela</div>
-          <div class="ci-actions">
-            <button class="qty-btn" onclick="cambiarCantidad(0,-1)">−</button>
-            <span class="qty-num" id="qty-0">1</span>
-            <button class="qty-btn" onclick="cambiarCantidad(0,1)">+</button>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <button class="ci-del" onclick="eliminarItem(0)">🗑</button>
-          <div class="ci-price" id="price-0">$88</div>
-        </div>
-      </div>
-      <div class="cart-item">
-        <div class="ci-icon">🧋</div>
-        <div class="ci-body">
-          <div class="ci-name">Frapé de Caramelo</div>
-          <div class="ci-mods">Grande · Frío · +Crema extra</div>
-          <div class="ci-actions">
-            <button class="qty-btn" onclick="cambiarCantidad(1,-1)">−</button>
-            <span class="qty-num" id="qty-1">1</span>
-            <button class="qty-btn" onclick="cambiarCantidad(1,1)">+</button>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <button class="ci-del" onclick="eliminarItem(1)">🗑</button>
-          <div class="ci-price" id="price-1">$100</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="height:1px;background:var(--warm);margin:16px 0"></div>
-    <p style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--latte);margin-bottom:10px;">¿Algo más?</p>
-    <div class="sugg-row">
-      <div class="sugg-card"><div class="sc-icon">🥐</div><div class="sc-name">Croissant</div><div class="sc-price">$35</div></div>
-      <div class="sugg-card"><div class="sc-icon">🍰</div><div class="sc-name">Pay de queso</div><div class="sc-price">$45</div></div>
-      <div class="sugg-card"><div class="sc-icon">🍫</div><div class="sc-name">Brownie</div><div class="sc-price">$40</div></div>
-      <div class="sugg-card"><div class="sc-icon">🍵</div><div class="sc-name">Té matcha</div><div class="sc-price">$70</div></div>
-    </div>
+    <div id="listaItems"></div>
   </div>
 
-  <div class="cart-summary">
-    <div class="summary-row"><span>Subtotal</span><span id="subtotal">$188</span></div>
-    <div class="summary-row"><span>Descuento miembro</span><span id="descuento" style="color:var(--success)">−$0</span></div>
-    <div class="summary-row total"><span>Total</span><span id="total">$188</span></div>
-    <button class="btn-full gold" onclick="window.location.href='s6-pago.html'">Continuar al pago →</button>
+  <div class="cart-summary" id="resumen" style="display:none">
+    <div class="summary-row"><span>Subtotal</span><span id="subtotalEl">$0</span></div>
+    <div class="summary-row" id="filaCupon" style="display:none">
+      <span>Descuento</span><span id="descuentoEl" style="color:var(--success)">−$0</span>
+    </div>
+    <div class="summary-row total"><span>Total</span><span id="totalEl">$0</span></div>
+    <button class="btn-full gold" onclick="irPago()">Continuar al pago →</button>
+    <button class="btn-full" onclick="window.location.href='s2-categorias.html'" style="background:transparent;border:1.5px solid var(--warm);color:var(--espresso);margin-top:8px">+ Agregar más bebidas</button>
   </div>
 </div>
+
 <script>
-// Integración backend:
-// GET /api/carrito/:sessionId → { items:[...], subtotal, descuento, total }
-// PATCH /api/carrito/:sessionId/item/:id → { cantidad }
-// DELETE /api/carrito/:sessionId/item/:id
-// POST /api/carrito/:sessionId/sugerido/:id → agregar item sugerido
+let carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
 
-// Cargar carrito de sessionStorage (o del backend)
-// const carrito = JSON.parse(sessionStorage.getItem('carrito') || '[]');
-
-const precios = [88, 100]; // precio por índice de item (en demo estático)
-const cantidades = [1, 1];
-
-function cambiarCantidad(idx, delta) {
-  cantidades[idx] = Math.max(1, cantidades[idx] + delta);
-  document.getElementById(`qty-${idx}`).textContent = cantidades[idx];
-  document.getElementById(`price-${idx}`).textContent = `$${precios[idx] * cantidades[idx]}`;
-  recalcular();
-  // TODO: PATCH /api/carrito/item/${idx}
+function guardar() {
+  sessionStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-function eliminarItem(idx) {
-  // TODO: DELETE /api/carrito/item/${idx}
-  console.log('Eliminar item:', idx);
-  // En producción: re-renderizar la lista
+function renderCarrito() {
+  const lista = document.getElementById('listaItems');
+  const resumen = document.getElementById('resumen');
+
+  if (!carrito.length) {
+    lista.innerHTML = `
+      <div class="empty-cart">
+        <div class="ec-icon">🛒</div>
+        <h3>Tu carrito está vacío</h3>
+        <p>Agrega bebidas desde el menú</p>
+        <button class="btn-full gold" onclick="window.location.href='s2-categorias.html'" style="margin-top:20px">Ver menú →</button>
+      </div>`;
+    resumen.style.display = 'none';
+    return;
+  }
+
+  lista.innerHTML = carrito.map((item, i) => {
+    const img = item.imagen_url
+      ? `<img src="${item.imagen_url}" alt="${item.nombre}" onerror="this.parentElement.innerHTML='☕'">`
+      : '☕';
+    const subtotalItem = item.precio_final * item.cantidad;
+    return `<div class="cart-item">
+      <div class="ci-img">${img}</div>
+      <div class="ci-body">
+        <div class="ci-name">${item.nombre}</div>
+        <div class="ci-mods">${item.tamano} · ${item.temperatura || 'Caliente'}${item.notas_item ? ' · '+item.notas_item : ''}</div>
+        <div class="ci-actions">
+          <button class="qty-btn" onclick="cambiarCantidad(${i}, -1)">−</button>
+          <span class="qty-num">${item.cantidad}</span>
+          <button class="qty-btn" onclick="cambiarCantidad(${i}, 1)">+</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <button class="ci-del" onclick="eliminar(${i})">🗑</button>
+        <div class="ci-price">$${subtotalItem}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  resumen.style.display = 'block';
+  recalcular();
+}
+
+function cambiarCantidad(i, delta) {
+  carrito[i].cantidad = Math.max(1, carrito[i].cantidad + delta);
+  guardar();
+  renderCarrito();
+}
+
+function eliminar(i) {
+  carrito.splice(i, 1);
+  guardar();
+  renderCarrito();
 }
 
 function recalcular() {
-  const sub = cantidades.reduce((s, c, i) => s + precios[i] * c, 0);
-  document.getElementById('subtotal').textContent = `$${sub}`;
-  document.getElementById('total').textContent = `$${sub}`;
+  const sub = carrito.reduce((s, item) => s + item.precio_final * item.cantidad, 0);
+  document.getElementById('subtotalEl').textContent = `$${sub}`;
+  document.getElementById('totalEl').textContent    = `$${sub}`;
+  // Guardar total para s6
+  sessionStorage.setItem('subtotal', sub);
+  sessionStorage.setItem('total', sub);
 }
+
+function irPago() {
+  if (!carrito.length) return;
+  window.location.href = 's6-pago.html';
+}
+
+renderCarrito();
 </script>
 </body>
 </html>
